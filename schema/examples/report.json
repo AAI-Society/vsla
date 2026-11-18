@@ -1,0 +1,14 @@
+{
+  "title": "Path traversal in vulnpkg.files.resolve_path allows reading arbitrary files",
+  "description": "resolve_path joins the caller-controlled user_path onto storage_root with no normalization; ../ and absolute paths escape the storage root.",
+  "repo": "example/vulnpkg",
+  "package": "vulnpkg",
+  "affected_versions": [
+    "<1.4.3"
+  ],
+  "proof_of_concept": "read_user_file('/srv/storage/alice', '../../etc/passwd')",
+  "cwe": "CWE-22",
+  "cvss_vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+  "reporter_contact": "researcher@example.org",
+  "wants_credit": true
+}

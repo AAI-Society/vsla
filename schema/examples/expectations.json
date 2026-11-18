@@ -1,0 +1,14 @@
+{
+  "harness": {
+    "qudisclose": {
+      "0.2.0": "7d431e7a58dcabddcdb597a2ddbe82024f50e77df0c4441b8467a0017c7b7071"
+    }
+  },
+  "measurements": [
+    {
+      "type": "signed-quote",
+      "value": "2e01175b4f0de302f3a4e3183ceb31451c98d597ae75c53f4a70b395ba78f5d82d711642b726b04401627ca9fbac32f5",
+      "harness": "7d431e7a58dcabddcdb597a2ddbe82024f50e77df0c4441b8467a0017c7b7071"
+    }
+  ]
+}

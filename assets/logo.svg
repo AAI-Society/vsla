@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="vsla">
+  <title>vsla</title>
+  <desc>Three rungs climbing toward a ring: the levels a disclosure can claim, and the one a verifier recomputes for itself.</desc>
+
+  <rect width="256" height="256" rx="52" fill="#0A0A0A"/>
+
+    <!-- the climb: the line a claim asserts, from unattested to hardened -->
+    <path d="M58 196 L198 84" stroke="#CFFF04" stroke-width="6" stroke-linecap="round" opacity="0.32"/>
+    <!-- three rungs: the levels a statement can earn, each a floor for the next -->
+    <path d="M40 196 H112" stroke="#CFFF04" stroke-width="11" stroke-linecap="round"/>
+    <path d="M84 152 H156" stroke="#CFFF04" stroke-width="11" stroke-linecap="round"/>
+    <path d="M128 108 H190" stroke="#CFFF04" stroke-width="11" stroke-linecap="round"/>
+    <!-- the level a verifier recomputes: the only one that counts -->
+    <circle cx="198" cy="72" r="20" fill="#0A0A0A" stroke="#CFFF04" stroke-width="7"/>
+</svg>

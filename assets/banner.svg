@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="vsla — on what basis should one machine believe another machine's bug report?">
+  <title>vsla</title>
+
+  <rect width="1200" height="320" fill="#0A0A0A"/>
+  <rect y="313" width="1200" height="7" fill="#CFFF04"/>
+
+  <!-- mark -->
+  <g transform="translate(96, 88) scale(0.56)">
+    <!-- the climb: the line a claim asserts, from unattested to hardened -->
+    <path d="M58 196 L198 84" stroke="#CFFF04" stroke-width="8" stroke-linecap="round" opacity="0.32"/>
+    <!-- three rungs: the levels a statement can earn, each a floor for the next -->
+    <path d="M40 196 H112" stroke="#CFFF04" stroke-width="14" stroke-linecap="round"/>
+    <path d="M84 152 H156" stroke="#CFFF04" stroke-width="14" stroke-linecap="round"/>
+    <path d="M128 108 H190" stroke="#CFFF04" stroke-width="14" stroke-linecap="round"/>
+    <!-- the level a verifier recomputes: the only one that counts -->
+    <circle cx="198" cy="72" r="24" fill="#0A0A0A" stroke="#CFFF04" stroke-width="10"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="272" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+        font-size="82" font-weight="700" fill="#F0EDEA" letter-spacing="-1">vsla</text>
+
+  <text x="274" y="206" font-family="ui-sans-serif, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="26" fill="#8F8A82">On what basis should one machine believe another machine's bug report?</text>
+
+  <g transform="translate(274, 236)">
+    <rect width="30" height="4" rx="2" fill="#CFFF04"/>
+    <text x="46" y="8" font-family="ui-sans-serif, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
+          font-size="19" font-weight="600" fill="#CFFF04" letter-spacing="1.4">ADVANCED AI SOCIETY</text>
+    <text x="306" y="8" font-family="ui-sans-serif, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
+          font-size="19" fill="#8F8A82">· SUPPLY-CHAIN LEVELS FOR MACHINE DISCLOSURE</text>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+[project]
+name = "vsla"
+version = "1.0.0"
+description = "VSLA: Vulnerability-disclosure Supply-chain Levels for Agents. Spec, paper, schema and reference verifier."
+requires-python = ">=3.12"
+dependencies = ["cryptography>=45", "jsonschema>=4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

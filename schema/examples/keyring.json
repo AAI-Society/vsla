@@ -1,0 +1,9 @@
+{
+  "finder:agent:researcher-1": "ed25519:c43efb2f4e207ecf351f41eb1ea924e96bac12ff7c5990e99000e414a94a5749",
+  "platform:cvd.example.org": "ed25519:e0e0bb14dfe6ea1d5075e54a76e146661e32dc4c33ff3d0deff58a0bd69dbf8d",
+  "maintainer:example/libparse": "ed25519:2242a63a88d6c850f1cb6f29c5a4a65b74f4ada9551703a19ef627c8e074357e",
+  "maintainer:acme/app": "ed25519:a8af07dc4de778f8c28fc07d246afeea5e9839a06a3cb7fd89a3b3e72d941e17",
+  "provider:qwen": "ed25519:75307c5f0de815e50153ab0b30dab4a29d367e872c950c798de0924ad4855805",
+  "root:example-root-of-trust": "ed25519:35b73384bd53320b38ffc77d5dd9e03adad9a8d3bf5c142452d56a6940f20031",
+  "log:log.example.org": "ed25519:3c635a018946f806cc869383f576c079bb4514ba5fb2ae7315b5da481c0600e0"
+}

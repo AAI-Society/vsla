@@ -1,0 +1,22 @@
+{
+  "status": "matched",
+  "revision": "9b2e7c1d4f0a6b3e8c5d2a1f7e9b4c6d8a0f1e2b",
+  "command": "python -m pytest -q tests/test_qud_cwe22.py",
+  "testDigest": {
+    "sha256": "63efb315ed71cc7e5a1fc202434bb3aec2091e7838707e148a017faebb7464fe"
+  },
+  "sandbox": {
+    "backend": "quome",
+    "isolation": "vm",
+    "digest": {
+      "sha256": "dff43d4d867b67d723d06a468bfeeea024522d6f2d0112becc1210ebce6cef16"
+    }
+  },
+  "attempts": 1,
+  "observedExit": 1,
+  "securityFailure": true,
+  "touchedSubject": true,
+  "outputDigest": {
+    "sha256": "90e3d1ddd9a32a570113eaf9900cb1ddc0d17413c8a1538b59ffe53458918cd5"
+  }
+}
