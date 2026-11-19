@@ -31,6 +31,20 @@ what channel, and those are the facts that disputes are about: who disclosed fir
 respected, whether the fix went out through the authoritative distribution. Only the receiver can sign those,
 and the receiver's clock is only as good as the transparency log it anchors the receipt in.
 
+**If the receiver re-runs the test anyway, what does the statement give it?**
+Less on the Evidence pillar than a SLSA consumer gets from build provenance, and the spec does not pretend
+otherwise. The platform that re-executes learns from Evidence L2 what it did itself. What it could not produce is the
+transcript commitment, the MBOM and the countersigned ledger, so for a direct receiver the statement's value is mostly
+on the Identity pillar: whom to re-execute first, how much admission to grant, which lane. The Evidence pillar pays off
+downstream: a maintainer who reads a platform's receipt instead of running the test, a coordinator without the code,
+an auditor later.
+
+**Who has to adopt VSLA before L2 means anything?**
+Three parties: codebases that declare a machine intake as the authoritative channel (VSLA-F-10), platforms that
+re-execute with VM isolation and countersign, and readers that pin those platforms. Until a second independent
+platform is pinned, a finder's ledger has one countersigner and, under the two-countersigner floor, cannot reach L2
+except through a maintainer's direct countersignature. That is the bootstrap cost of the design.
+
 **Why a trust ledger instead of a bounty?**
 Bounties pay for findings and so reward volume and first-to-file. Maintainers of core infrastructure have
 rejected bounty programs for their projects because of the arguments they generate over breaking fixes and
