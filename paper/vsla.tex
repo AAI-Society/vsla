@@ -379,7 +379,7 @@ weights} (T9) are recorded at \lvl{3}: attestation names the bytes, not their be
 Three threats the first draft did not have come from the long game and the ledger. \emph{Trust laundering}
 (T16) is the xz-utils pattern with a reputation ledger in place of a human persona: a finder earns \lvl{2} over
 months and spends it on one harmful change, a weakened check or a payload in a fixture. \vsla{} mitigates it at
-\lvl{2} with three rules: the receiver runs its own review on a model family different from the patcher's; a
+\lvl{2} with three rules: the receiver runs its own review on model families the finder's MBOM does not declare; a
 diff that touches build scripts, CI, fixtures, binaries, manifests or release tooling is capped at \lvl{1}
 whatever the review says, because that is where real compromises have landed; and a patch reverted for cause
 is a disqualifying, retroactive outcome. None of that makes a source-only diff safe to merge unread, and the
@@ -528,9 +528,12 @@ A disclosure makes two claims verified differently: \emph{this bug is real} and 
 precision on findings buys no trust on patches. The Patch track's \lvl{1} requires that the diff applied, the
 reproduction passed and the project suite passed, all executed by code in a clean checkout, with the files
 touched and a computed scope in the statement. Its \lvl{2} requires that the \emph{receiving platform} re-ran all
-three, ran its own adversarial review on a model family different from every patcher in the MBOM, over the
-diff and the test output only, and computed that the scope is source-only; a finder-asserted review satisfies
-nothing. The Patch track answers the question maintainers actually ask of a machine patch, ``do I have to read
+three, ran its own adversarial review on model families different from every family the MBOM declares, over the
+diff, the test output and the source it changes, but never the patcher's reasoning, and computed that the scope is
+source-only; a finder-asserted review satisfies nothing. Below \lvl{3} a family in the MBOM is the finder's word,
+and a finder that labels its patcher's family falsely could steer a single reviewer onto the patcher's own family, so
+when any model is API-served or unattested the receiver uses two reviewers of distinct undeclared families, both of
+which must approve, and a mislabel can match at most one. The Patch track answers the question maintainers actually ask of a machine patch, ``do I have to read
 this carefully, or can I merge it?'', and the honest answer is narrower than the question: Patch \lvl{2} means
 less review is needed to confirm that the fix closes the finding and passes the suite. It never means a change
 to a security-sensitive surface may be merged unread.

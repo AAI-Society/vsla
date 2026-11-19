@@ -255,6 +255,29 @@ def test_finder_asserted_review_does_not_satisfy_e8():
     assert v.verify(load("patch-l2.dsse.json"), **kw).pillars["evidence"].failed == "E8"
 
 
+def test_receiver_review_families_do_not_rest_on_the_finders_mbom():
+    """VSLA-P-10: below L3 the MBOM's families are the finder's word, so a finder that mislabels its patcher could steer
+    the receiver into reviewing with the patcher's own family. With any API-served or unattested model in the MBOM,
+    E8 needs two approving receiver reviewers of two distinct families, neither of them any family the MBOM declares;
+    a mislabel can then collide with at most one. The verifier computes this; the receipt's distinctFamily flag alone
+    does not satisfy it."""
+    kw = inputs("patch-l2"); kw.pop("receipt")
+    rx = load("reexecution-patch.json")
+    stmt = v.envelope_payload(load("patch-l2.dsse.json"))
+    declared = {m["family"] for m in stmt["predicate"]["mbom"]["models"]}
+    assert any(m["serving"] == "api" for m in stmt["predicate"]["mbom"]["models"])
+    fams = [r["family"] for r in rx["review"]["reviewers"]]
+    assert len(set(fams)) == 2 and not set(fams) & declared
+    assert check(v.verify(load("patch-l2.dsse.json"), **kw), "E8").ok
+    one = {**rx["review"], "reviewers": rx["review"]["reviewers"][:1]}                         # one reviewer: a mislabel could match it
+    same = {**rx["review"], "reviewers": [rx["review"]["reviewers"][0]] * 2}                    # two reviewers, one family
+    declared_family = {**rx["review"], "reviewers": [{**rx["review"]["reviewers"][0], "family": sorted(declared)[0]}, rx["review"]["reviewers"][1]]}
+    dissent = {**rx["review"], "reviewers": [*rx["review"]["reviewers"], {**rx["review"]["reviewers"][0], "family": "other", "approved": False}]}
+    for review in (one, same, declared_family, dissent):
+        kw["reexecution"] = {**rx, "review": review}
+        assert not check(v.verify(load("patch-l2.dsse.json"), **kw), "E8").ok
+
+
 def test_non_source_paths():
     """VSLA-F-18."""
     assert v.non_source_paths(["src/a.py", ".github/workflows/ci.yml", "tests/fixtures/blob.bin", "pyproject.toml", "Makefile", ".gitmodules", "conftest.py", "vulnpkg/site.pth"]) == \
