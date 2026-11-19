@@ -9,8 +9,9 @@ adds the receipt and the record; L3 adds the environment. A signed report is L0 
 No. L1 proves that a finder-authored test fails reproducibly at the named revision and that the finder signed
 a complete account of the run. A finder can write a test that fails on demand. The first check that speaks to
 whether the bug is real is the receiver's own re-execution at L2, with the receiver's own classifier and a
-check that the test actually exercised the code the report names, and even that proves "this test fails for
-an assertion in this code", not "this is exploitable". The semantic judgement is still the receiver's.
+check that the test actually exercised the code the report names, and a control run of the unchanged test where it must pass (a reference revision or a candidate fix), so a
+test that fails on demand is caught. Even that proves "this test's verdict depends on this code", not "this is
+exploitable". The semantic judgement is still the receiver's.
 
 **Why a model bill of materials?**
 Because the model is a dependency of the finding in exactly the way a library is a dependency of a build, and

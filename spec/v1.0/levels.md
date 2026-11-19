@@ -62,7 +62,8 @@ Everything in L1, plus:
   offers one;
 - the platform **independently re-executed** the reproduction in its own isolated sandbox, at the subject
   revision, classified the failure with its own classifier, checked that the test exercised the code the
-  report names, and put the result in the receipt. The finder's word about the exit code is no longer the
+  report names, ran the unchanged test at a control where it must pass (a reference revision or a candidate
+  fix), so a test that fails on demand is caught, and put the result in the receipt. The finder's word about the exit code is no longer the
   only word. On the Patch track the platform also ran its own adversarial review on a different model family,
   and the diff touches source only;
 - the finder has a **trust ledger**: an append-only log of its past disclosures, each with an outcome

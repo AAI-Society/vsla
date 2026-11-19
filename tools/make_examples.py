@@ -113,8 +113,11 @@ def main() -> None:
     channel = {"intake": INTAKE, "intakeKey": pk(platform), "declaredIn": "SECURITY.md"}
     reexec = {"status": "matched", "revision": commit, "command": command, "testDigest": d("test body"), "sandbox": sandbox, "attempts": 1,
               "observedExit": 1, "securityFailure": True, "touchedSubject": True, "outputDigest": output}
+    # the control: the unchanged test passes with a candidate fix applied, so its verdict depends on the subject (VSLA-P-4)
+    control = {"kind": "candidate-fix", "diffDigest": d("candidate fix"), "testUnchanged": True, "passed": True}
     reexec_patch = {**reexec, "applied": True, "reproductionPasses": True, "suitePasses": True, "scope": "source-only",
                     "review": {"approved": True, "reviewerFamily": "qwen", "distinctFamily": True, "verdictDigest": d("approved")}}
+    reexec = {**reexec, "control": control}
 
     def finish(pred: dict, name: str, *, subj: list | None = None, receipt_reexec: dict | None = None, enclave_sign: bool = False) -> dict:
         env = sign_envelope(statement(subj or subject, pred), [("finder:agent:researcher-1", finder)])

@@ -651,6 +651,7 @@ def public_hex(pub: Ed25519PublicKey) -> str:
 DISQUALIFYING = {"non-authoritative-release", "ledger-fork", "retracted"}
 NEGATIVE = {"rejected", "false-positive"}
 NEUTRAL = {"duplicate", "withdrawn", "reproduced-unresolved"}
+CONTROL_KINDS = {"reference-revision", "candidate-fix"}
 
 
 def countersigner_operator(keyid: str) -> str:
@@ -957,8 +958,12 @@ def verify(envelope: dict[str, Any], keyring: Keyring, *, expectations: dict[str
         _run(E, "E8", 2, rx_at_rev and rv.get("approved") is True and rv.get("distinctFamily") is True and scope_ok,
              f"receiver review approved={rv.get('approved')} distinctFamily={rv.get('distinctFamily')} scope={rx.get('scope')}; finder-asserted review is informational")
     else:
-        _run(E, "E7", 2, rx_at_rev and rx.get("observedExit") == 1 and rx.get("securityFailure") is True and rx.get("touchedSubject") is True,
-             f"re-execution status={rx.get('status')!r} touchedSubject={rx.get('touchedSubject')} isolation={iso} by {who}")
+        # the control: the same, unchanged test passes at a reference revision or with a candidate fix applied, so its
+        # verdict depends on the subject's behaviour; a test that fails everywhere (`assert False`) has no passing control
+        ctl = rx.get("control") or {}
+        ctl_ok = ctl.get("kind") in CONTROL_KINDS and ctl.get("passed") is True and ctl.get("testUnchanged") is True
+        _run(E, "E7", 2, rx_at_rev and rx.get("observedExit") == 1 and rx.get("securityFailure") is True and rx.get("touchedSubject") is True and ctl_ok,
+             f"re-execution status={rx.get('status')!r} touchedSubject={rx.get('touchedSubject')} control={ctl.get('kind')}:{'passed' if ctl_ok else 'missing or failed'} isolation={iso} by {who}")
 
     # ---------------------------------------------------------------- Identity
     auth = pred.get("authorization", {}) or {}

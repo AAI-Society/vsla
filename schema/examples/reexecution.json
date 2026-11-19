@@ -18,5 +18,13 @@
   "touchedSubject": true,
   "outputDigest": {
     "sha256": "90e3d1ddd9a32a570113eaf9900cb1ddc0d17413c8a1538b59ffe53458918cd5"
+  },
+  "control": {
+    "kind": "candidate-fix",
+    "diffDigest": {
+      "sha256": "1fb2b73c638768a8f383dda36d657fec18cbb9d35e420222bcc49657bca8f9f7"
+    },
+    "testUnchanged": true,
+    "passed": true
   }
 }

@@ -15,7 +15,7 @@
   <img alt="in-toto" src="https://img.shields.io/badge/provenance-in--toto%20%2B%20DSSE-CFFF04?style=flat-square&labelColor=0A0A0A">
   <img alt="Merkle" src="https://img.shields.io/badge/transcript-RFC%206962%20Merkle-CFFF04?style=flat-square&labelColor=0A0A0A">
   <img alt="Implementation" src="https://img.shields.io/badge/implementation-qudisclose-CFFF04?style=flat-square&labelColor=0A0A0A">
-  <img alt="Tests" src="https://img.shields.io/badge/reference%20verifier-53%20tests-CFFF04?style=flat-square&labelColor=0A0A0A">
+  <img alt="Tests" src="https://img.shields.io/badge/reference%20verifier-54%20tests-CFFF04?style=flat-square&labelColor=0A0A0A">
   <img alt="License" src="https://img.shields.io/badge/spec-CC%20BY%204.0-CFFF04?style=flat-square&labelColor=0A0A0A">
 </p>
 
@@ -52,7 +52,7 @@ actually received it. Those are the things a machine receiver has to decide on, 
 |---|---|---|
 | **L0 Unattested** | an email, an issue, a scanner dump | nothing; trust is whoever sent it |
 | **L1 Attested** | the finder signed a complete, reproducible account: authorization basis, model bill of materials, Merkle-rooted transcript, a test executed by code at the subject revision | *defeats* forged, replayed or edited-after-signing statements and over-claimed levels; *mitigates* hallucinated findings (the test was run; it may still be wrong); *records* model substitution |
-| **L2 Trusted** | an authoritative platform re-ran the test itself, classified it, checked its coverage, reviewed the patch on a different model family, and signed a receipt; the finder's countersigned ledger verifies against the countersigners the platform pins and meets the floors | *mitigates* flooding, forged receipt time, trust laundering, Sybil countersigners, hostile reproductions, embargo inference; *records* non-authoritative release |
+| **L2 Trusted** | an authoritative platform re-ran the test itself, classified it, checked its coverage, ran it unchanged at a control where it must pass, reviewed the patch on a different model family, and signed a receipt; the finder's countersigned ledger verifies against the countersigners the platform pins and meets the floors | *mitigates* flooding, forged receipt time, trust laundering, Sybil countersigners, hostile reproductions, embargo inference; *records* non-authoritative release |
 | **L3 Hardened** | weights, harness, policy, sandbox and signing key inside an attested environment (TEE or two-operator split); the quote binds them; the measurement is on the verifier's allowlist; every weight digest matches a provider attestation | *mitigates* forged provenance and model substitution; *records* tampered weights. Any api-served model caps this pillar at L2 |
 
 Every level is judged on three pillars, **Evidence** (is the bug real?), **Identity** (who says so, and what
