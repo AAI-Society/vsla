@@ -347,8 +347,8 @@ Slop detection & Slop-Score~\cite{slopsurvey} & substance as a mechanical requir
 \end{figure}
 
 Figure~\ref{fig:threats} is the framework's threat table in the \slsa{} style, with one discipline \slsa{}'s table
-does not need: three distinct words for what a level does. The first draft of this paper said ``defeated'' in
-rows where only ``mitigated'' or ``recorded'' is true, and two reviewers caught it independently. A level
+does not need: three distinct words for what a level does, because the difference between them is easy to blur and
+the blur is exactly the over-claiming the framework exists to stop. A level
 \emph{defeats} a threat when the receiver detects it mechanically and treats the disclosure as \lvl{0} before
 acting. It \emph{mitigates} a threat when it raises the cost or narrows the attack, which can still succeed. It
 \emph{records} a threat when the attack succeeds and the level makes it attributable to an identity afterwards.
@@ -376,7 +376,7 @@ configuration the platform and the finder can be the same operator. \emph{Forged
 \lvl{3}: the key cannot leave the enclave, but the operator still chooses the enclave's inputs. \emph{Tampered
 weights} (T9) are recorded at \lvl{3}: attestation names the bytes, not their behaviour.
 
-Three threats the first draft did not have come from the long game and the ledger. \emph{Trust laundering}
+Three threats come from the long game and the ledger. \emph{Trust laundering}
 (T16) is the xz-utils pattern with a reputation ledger in place of a human persona: a finder earns \lvl{2} over
 months and spends it on one harmful change, a weakened check or a payload in a fixture. \vsla{} mitigates it at
 \lvl{2} with three rules: the receiver runs its own review on a model family different from the patcher's; a
@@ -393,10 +393,9 @@ mitigation.
 
 \paragraph{The codebase or the environment.} \emph{Prompt injection} (T10): a comment in the repository tells
 the agent to report nothing, or a proof-of-concept in a report tells the triage agent to rate it critical.
-Mitigated at \lvl{1}, eliminated at none. A \emph{malicious reproduction} (T11) is the threat the first draft
-listed as ``sandbox escape'' and marked defeated by policy. It is the largest exposure in the design: \lvl{2}
+Mitigated at \lvl{1}, eliminated at none. A \emph{malicious reproduction} (T11) is the largest exposure in the design: \lvl{2}
 \emph{requires} the platform to execute a test written by a party it has no history with, and the platform's
-signing key is the whole of \lvl{2}. The specification now states isolation requirements (no egress, no access
+signing key is the whole of \lvl{2}. The specification states isolation requirements (no egress, no access
 to keys, tokens, the database or other cases, resource caps, a distinct principal, VM isolation in production,
 the isolation class written into every receipt) and admission control (T17); the threat is mitigated, and a
 platform running a process-level sandbox in production has not mitigated it.
@@ -405,8 +404,8 @@ platform running a process-level sandbox in production has not mitigated it.
 embargoed finding (T14), \emph{poison or inflate} a ledger (T22), or have its \emph{key stolen} (T18), which
 forges every receipt and countersignature it ever issued. \emph{Embargo inference} (T19) reads which projects
 are being probed, which files, and when the fix is coming from statement fields, ledger timing and status
-polling; the first draft called the statement ``safe to publish while embargoed'' while its predicate carried
-the test path, the command and the files touched in plaintext. The embargoed profile and a rule that no
+polling, and a statement that carries the test path, the command or the files touched in plaintext describes the bug
+in one line. The embargoed profile and a rule that no
 per-case metadata is exposed until the case is public are the mitigation. A model provider with advanced
 internal tooling has \emph{asymmetric knowledge} (T15), and a platform that runs every role on one provider's
 model has that provider \emph{steering} every decision (T23); reviewer diversity on the Patch track is the only
@@ -447,10 +446,9 @@ compare against.
 Every verification check is also marked \emph{external} or \emph{structural}. An external check compares the
 statement against something the finder did not write: a pinned key, an expectation the receiver obtained
 independently, or the receiver's own execution. A structural check compares the statement against itself.
-Only external checks separate the levels. The first draft's verifier had several \lvl{2} and \lvl{3} checks that
-were structural (the finder's harness digest against the finder's own first leaf; the finder's weight digest
-against the finder's own copy of a ``provider attestation''), which is the \slsa{} mistake of verifying
-provenance without expectations; the distinction is now explicit in the procedure and in every verification
+Only external checks separate the levels. Comparing the finder's harness digest with the finder's own first leaf, or
+the finder's weight digest with the finder's own copy of a ``provider attestation'', is the \slsa{} mistake of
+verifying provenance without expectations; the distinction is explicit in the procedure and in every verification
 record.
 
 \subsection{Levels}
@@ -499,8 +497,7 @@ operator still chooses what the enclave sees), or well-behaved weights (attestat
 behaviour). An API-served model cannot be measured, so a pipeline with any API-served model, including the
 one this paper's authors run for their patch agents, stops at \lvl{2} on the Environment pillar.
 
-\paragraph{Where the \slsa{} analogy breaks.} The first draft said \lvl{3} ``is the same move \slsa{} Build
-\lvl{3} makes''. It is not. \slsa{} Build \lvl{3} is non-forgeable because a \emph{third party}, the hosted build
+\paragraph{Where the \slsa{} analogy breaks.} \vsla{} \lvl{3} is not the move \slsa{} Build \lvl{3} makes. \slsa{} Build \lvl{3} is non-forgeable because a \emph{third party}, the hosted build
 platform, holds the signing key away from the producer. \vsla{} \lvl{2} is a receiver-side property with no
 \slsa{} analogue (the consumer re-executes and countersigns), and \vsla{} \lvl{3} keeps the key in hardware the
 \emph{producer} operates. The analogue of \slsa{}'s trusted builder would be a third-party finder-hosting
@@ -555,21 +552,18 @@ predicate type is \texttt{https://vsla.dev/provenance/v1}. Three further signed 
 ledger entry and the weight attestation, are DSSE envelopes with their own payload types, so that no two
 objects signed by one key can be confused for each other. Every canonical body is RFC 8785 JSON, and a verifier parses every
 signed payload strictly: a payload that does not re-serialise to itself, or that carries a duplicate key, is
-rejected, so two conforming verifiers cannot read different values from one signature. The first draft said
-``sorted keys, no whitespace'' and its three implementations already disagreed on float formatting and on which
-fields a ledger entry's signature covered; the second enforced nothing about the bytes it signed.
+rejected, so two conforming verifiers cannot read different values from one signature. ``Sorted keys, no whitespace'' is not
+enough: implementations that follow it still disagree on float formatting and on which fields a signature covers.
 
 The design rule is \emph{digests go in, bodies stay out}: the statement commits to the transcript, the
-proof-of-concept, the diff and the test output by digest and carries none of their text. The first draft
-claimed this made a statement safe to publish during embargo, while the predicate carried the test path, the
-command and the files touched in plaintext, each of which is a one-line description of the bug. A statement
-now has a \emph{profile}: in the \texttt{embargoed} profile those fields are digests and the repository name
+proof-of-concept, the diff and the test output by digest and carries none of their text. That alone does not make a statement safe to publish during embargo,
+because the test path, the command and the files touched are each a one-line description of the bug, so a statement
+has a \emph{profile}: in the \texttt{embargoed} profile those fields are digests and the repository name
 may be too; in the \texttt{published} profile they are plaintext, and the receipt's command digest lets a third
 party match the two later.
 
 \paragraph{Subject.} The digest of the report fields that describe the bug (not contact or credit) and the
-git commit, which the reproduction's revision must equal. It identifies this report; the first draft also
-claimed it was a deduplication key, which it is not, since two finders describe one bug differently.
+git commit, which the reproduction's revision must equal. It identifies this report; it is not a deduplication key, since two finders describe one bug differently.
 A Patch-track statement adds the diff digest.
 
 \paragraph{Authorization.} The basis on which the finder was entitled to test the code (ownership, a published
@@ -579,8 +573,7 @@ cannot enforce it.
 \paragraph{Model bill of materials.} Every model that produced or filtered content on the path to the
 finding: role, provider, name, family, version, serving mode, and for self-hosted models either a digest of the
 loaded weight bytes with the provider's signed attestation when one exists, or \texttt{unmeasured}. A digest of
-the model's \emph{name}, which the first implementation emitted, is a false statement and is now a schema
-violation. Omitting a model that took part voids the statement. When a model turns out to be bad, the MBOM
+the model's \emph{name} is a false statement and a schema violation. Omitting a model that took part voids the statement. When a model turns out to be bad, the MBOM
 answers which disclosures it touched, exactly as an SBOM answers which builds used a vulnerable library; it is
 a traceability device, not a detector.
 
@@ -610,9 +603,9 @@ revision executed against, the sandbox backend, isolation class and digest, the 
 end times. The executor is \texttt{code}: a test runner produced the exit code, not a model's assertion that it
 ran. The classification of the failure is by a normative rule over the runner's structured result (at least one
 collected test failed by assertion; no collection, import, fixture or timeout error), not a substring search over its
-output, which is what the first implementation did. The second review showed the limit of that rule: the runner
+output. The rule has a limit: the runner
 writes its report inside the process the test runs in, so a hostile test can forge it, and a test that imports the
-subject and asserts false needs no forgery at all. The classifier filters honest error, and the specification now
+subject and asserts false needs no forgery at all. The classifier filters honest error, and the specification
 says so; the semantic judgement is the receiver's.
 
 \paragraph{Receipt.} The platform's countersignature is a separate DSSE object (Figure~\ref{fig:receipt}), not a
@@ -623,15 +616,13 @@ at, its own classification, whether the test loaded the subject package and how 
 covered), the sandbox's backend and isolation class, and on the Patch track its own review and the scope it
 computed. A receipt is issued once per case, so a finder always holds proof of receipt and a negative receipt is
 what it disputes. A receipt counts only under the platform key the statement itself names in its channel, and a
-verifier reads its re-execution result only after that binding has verified: the second review reached a verified
-\lvl{2} with a receipt the finder had signed under its own pinned key. The first draft said the receipt settles
-``who knew what, when'' without either party's cooperation; it settles it with the platform's cooperation and
-honesty, and the receipt therefore may carry an \emph{anchor} in one of two named forms. \emph{Log inclusion} is a
+verifier reads its re-execution result only after that binding has verified, since otherwise a receipt the finder
+signed under its own pinned key would pass. The receipt settles ``who knew what, when'' only with the platform's
+cooperation and honesty, and the receipt therefore may carry an \emph{anchor} in one of two named forms. \emph{Log inclusion} is a
 log's signed checkpoint and an inclusion proof for the receipt body as a leaf, the shape Rekor and SCITT provide and
 the one the shipped examples carry; it is what ``anchored in a transparency log'' means. A \emph{signed timestamp} is
 a pinned log key's signature over the receipt digest; it proves that the receipt existed by that time on one more
-key's word and nothing about append-only-ness, and the third review was right that revision 3 let it stand in for
-the first. A verifier that will act on another platform's receipt runs with the anchor required, under which only
+key's word and nothing about append-only-ness, and must not stand in for log inclusion. A verifier that will act on another platform's receipt runs with the anchor required, under which only
 log inclusion satisfies it unless the policy opts into timestamps, and an unanchored receipt then fails and is not
 read for evidence either. The anchor's time is also the \emph{evaluation instant}: every key window, every
 revocation and the rubric's decay are judged at it, never at a time the checked party wrote, so the same anchored
@@ -646,20 +637,17 @@ advisory issued; not merely ``we reproduced it''), \texttt{duplicate}, \texttt{r
 \texttt{reproduced-unresolved}, \texttt{withdrawn}, \texttt{non-authoritative-release}, \texttt{retracted} and
 \texttt{ledger-fork}, plus \texttt{successor} and \texttt{revoke} entries for key rotation. The finder's operator
 owns the index: it appends entries in the order it receives them, and no countersigned entry carries a sequence
-number. Revision 3 had the closing platform assign one, and the third review showed what every log engineer knows:
-two honest platforms closing cases for one finder both assign the same number, and the finder forks through no fault
-of its own. A finder keeps one ledger per track and every entry names the finder's key or a predecessor in its
-successor chain; a verifier drops entries that name another key or another track, because the second review borrowed
-another finder's published ledger and spent Finding history on the Patch track; and the rubric's window is the last
-fifty entries by countersigned time, which the finder cannot choose, so the reordering that moved a score from $0.37$
-to $0.93$ in the second review now moves nothing. The finder's operator keeps the canonical copy and every platform
+number: if the closing platform assigned one, two honest platforms closing cases for one finder would both assign the
+same number, and the finder would fork through no fault of its own. A finder keeps one ledger per track and every entry names the finder's key or a predecessor in its
+successor chain; a verifier drops entries that name another key or another track, so another finder's published ledger cannot be
+borrowed and Finding history cannot be spent on the Patch track; and the rubric's window is the last fifty entries by
+countersigned time, which the finder cannot choose, so reordering a ledger cannot move its score. The finder's operator keeps the canonical copy and every platform
 that wrote to it keeps a mirror; a platform stores the root and count of the ledger it was \emph{shown}, checks on
 the next submission that the prefix is unchanged and that every entry the platform itself countersigned is
 \emph{included}, at any position, and records a fork otherwise (Figure~\ref{fig:consistency}). Inclusion rather than
-position is what lets concurrent closes at several platforms coexist; omission of a platform's rejection is now
-unambiguous and disqualifying. This detects a split view only between platforms that compare notes. The first draft said ``a finder cannot present a trimmed history''; it
-can, to a platform that has never seen it, and the specification now says so and names a shared transparency
-log as the remedy. Until then a ledger is evidence about the finder's history \emph{with the countersigners the
+position is what lets concurrent closes at several platforms coexist; omission of a platform's rejection is
+unambiguous and disqualifying. This detects a split view only between platforms that compare notes: a finder can present a trimmed history to a
+platform that has never seen it, and the specification says so and names a shared transparency log as the remedy. Until then a ledger is evidence about the finder's history \emph{with the countersigners the
 reader has pinned}, which is also exactly what the rubric computes.
 
 \begin{figure}[htbp]
@@ -678,14 +666,14 @@ reader has pinned}, which is also exactly what the rubric computes.
 reference \texttt{signed-quote}), the measurement, what it covers, the quote, the root of trust, and the enclave
 key. The quote binds four things: the enclave key, the harness digest, every weight digest and the sandbox
 digest; a verifier derives those from the statement and asks the adapter for that environment type whether the
-quote binds exactly them. The first draft had the verifier \emph{pin} the enclave key in its keyring, which
-inverts attestation; the key now comes from the verified quote and nowhere else. The specification also says,
+quote binds exactly them. The enclave key comes from the verified quote and nowhere else; pinning it in the
+verifier's keyring would invert attestation. The specification also says,
 per environment type, where the bindings live, because the launch digest of a confidential VM covers the guest
 image and not the tens of gigabytes of weights loaded after boot: for SEV-SNP and TDX the bindings go through
 \texttt{REPORT\_DATA}, which carries the digest of the same canonical binding body the reference adapter signs,
 and a measured integrity root, and a reference measurement without a reproducible guest image means only ``some
 VM ran under SEV-SNP''. A two-operator quote must be co-signed by two distinct pinned roots; one root listed twice
-is one operator, which is what the second review's probe presented. The reference adapter proves only that a
+is one operator. The reference adapter proves only that a
 pinned root key signed the bindings, is never allowlisted in production, and hardware adapters are not
 implemented.
 
@@ -693,10 +681,8 @@ implemented.
 verifier follows the chain backwards from the pinned current key so that outcomes earned under the old key count
 for the new one; it is revoked with a \texttt{revoke} entry signed by the operator, which fails the statement when
 the revocation is not after the evaluation instant. Pinned keys carry validity windows, judged at the same instant.
-``Dated after a revocation'' means dated by the anchor or the verifier, never by the key holder: the third review
-showed a revoked key verifying a statement whose finder-written finish time predated the revocation. The first draft
-had no key lifecycle at all, which for a reputation system means a stolen key is a stolen reputation; the third draft
-specified one and implemented none of it, which the third review called out.
+``Dated after a revocation'' means dated by the anchor or the verifier, never by the key holder, or a revoked key could verify a statement by writing a finish time before the revocation.
+Without a key lifecycle a stolen key is a stolen reputation, and the reference verifier processes both entry kinds.
 
 \section{Verification and the trust rubric}
 \label{sec:verification}
@@ -728,20 +714,15 @@ pillars and the claim (Figure~\ref{fig:verified}). Six properties follow. A miss
 the check that needs it rather than raising an error, so a coordinator who holds the statement but not the code
 lands at Evidence \lvl{1}, and a verifier without expectations lands at Environment \lvl{1}, which are the honest
 answers. Every time-dependent check is judged at one evaluation instant, the anchor's time when there is one, the
-receipt's otherwise, the verifier's clock failing both, so a verification is a function of its inputs; the third
-draft judged each key at a time its holder had written and recomputed the rubric at the verifier's wall clock, so
-the same statement could pass today and fail next month. A self-reported value never substitutes for an input: the first draft's reference verifier granted
-Identity \lvl{2} on the finder's own history summary when no ledger was supplied, and a ledger whose every
-signature was replaced by garbage scored the same as the real one. A countersignature counts only under the key
-the statement binds itself to: the second draft accepted a receipt under any pinned key, including the finder's
-own, and read its re-execution result before checking who signed it. The verifier with the code must re-execute
+receipt's otherwise, the verifier's clock failing both, so a verification is a function of its inputs and the same statement cannot pass today and fail next month. A self-reported value never substitutes for an input: a history summary is not a ledger, and a ledger entry whose
+signature does not verify does not count. A countersignature counts only under the key
+the statement binds itself to, and a receipt's re-execution result is read only after that is checked. The verifier with the code must re-execute
 the reproduction itself at the subject revision; a platform's receipt is evidence for a third party, not a
 substitute for the verifier's own run. And both the claim and every check, with its kind, go into the platform's
-audit log and into the ledger entry. Every attack the five reviews demonstrated is a failing test in the
-reference suite (Figure~\ref{fig:attacks}); the pattern the first two rounds share is a check that compares against
-something the finder controls, or does not compare at all, which is why the matrix names, for every check, what it
-compares against; the third round's pattern is a design question the specification had not decided, which is why
-the specification now says who owns the ledger's index and which clock governs validity.
+audit log and into the ledger entry. Every attack the reviews demonstrated is a failing test in the
+reference suite (Figure~\ref{fig:attacks}; Appendix~\ref{app:history}); most were a check that compared against
+something the finder controls, or did not compare at all, which is why the matrix names, for every check, what it
+compares against.
 
 \paragraph{Trust score.} Within a level, the ledger yields a score that platforms use to rank, route and
 rate-limit and that sets the \lvl{2} floor. After dropping entries whose countersignature does not verify under
@@ -755,14 +736,11 @@ C &= \max(0, 1-\tfrac{2o}{n}), \qquad R = 1 - \tfrac{1}{2}\min\!\Big(1, \textsty
 \text{score} &= 0 \text{ if any entry is disqualifying or } o/n \ge \tfrac12, \text{ else } P\,(0.5 + 0.2B + 0.2S + 0.1C)\,R.
 \end{align*}
 The default floor for \lvl{2} is $0.60$ with at least five counted entries from at least two distinct pinned
-countersigners and a ledger at least 30 days old; the age is a gate, not a term. Every change from the first
-rubric closes a specific attack a reviewer demonstrated. Duplicates counted as positives, so a finder could
-farm them from public cases; they are now neutral. Withdrawing was penalised, which punishes the behaviour you
-want. Recency looked only at the most recent rejection, so ten rejections last month scored as one; it now sums
-them with decay. Calibration carried a tenth of the weight, so over-claiming \lvl{3} on every statement cost
-$0.1$; it is now twice as steep and disqualifying at half the window. And two colluding keys with five
-accepted entries scored $0.733$ on day zero, above the floor; the age gate and the countersigner allowlist
-close that, and the specification says plainly that two countersigners is a floor on distinct pinned operators
+countersigners and a ledger at least 30 days old; the age is a gate, not a term. Each term answers a specific attack. Duplicates are neutral, so they cannot be farmed
+from public cases. Withdrawing is not penalised, since it is the behaviour you want. Recency sums every rejection
+with decay, so ten rejections last month are not one. Calibration disqualifies at half the window, so over-claiming
+\lvl{3} on every statement is not a rounding error. And the age gate and the countersigner allowlist stop two
+colluding keys reaching the floor on day zero; the specification says plainly that two countersigners is a floor on distinct pinned operators
 (two keys of one operator are one countersigner), not on independence. A new finder has no ledger and therefore no \lvl{2}; that is intended. It discloses at \lvl{1} to
 platforms that accept \lvl{1} into a slower lane, collects countersigned outcomes, and crosses the floor the way
 a contributor earns commit rights. An honest finder that discloses to a single platform has one countersigner
@@ -781,14 +759,14 @@ that cost rather than count a platform's self-countersigned entries twice.
 qudisclose~\cite{qudisclose} is a machine-to-machine disclosure platform: an MCP intake with bearer tokens
 and Ed25519-signed envelopes, a team of agents (triage, reproducer, patcher, reviewer, release, postmortem),
 code-side verification in clean worktrees, a hash-chained and signed audit log, and an always-on hunter that
-runs on self-hosted models (Figure~\ref{fig:qudisclose}). The \vsla{} layer, as revised after review, adds:
+runs on self-hosted models (Figure~\ref{fig:qudisclose}). The \vsla{} layer adds:
 
 \begin{itemize}
   \item \textbf{Transcript capture.} A recording provider wraps every model call with the case id and appends a leaf to the case's transcript; sandbox tool calls and the orchestrator's own run of the reproduction are leaves too. Leaf 0 is the measured harness and sandbox digest; a verification leaf records the test run.
   \item \textbf{Statements on both tracks.} When the orchestrator has verified the reproduction it emits a Finding statement in the embargoed profile; when a patch has passed reproduction, suite and review it emits a Patch statement with the computed scope. The MBOM names each model's family and serving mode; a self-hosted model carries a digest of its weight file when the operator configured one and \texttt{unmeasured} otherwise. Statements are signed by the deployment's attestation identity, stored as case artifacts, and served over MCP in the embargoed profile until the case is public.
-  \item \textbf{Receipts and verification at intake.} A submission may carry a statement. The intake verifies it against its own expectations (its harness digest for the running version), re-executes the reproduction at the subject revision in a clean sandbox, classifies the result from the runner's structured output (written to a per-run random path and cross-checked against the runner's own summary and exit code; it defends against honest error, not a hostile test, as Section~\ref{sec:provenance} says), checks that the test imported or covered the package the platform's repository configuration names (never a name the report supplies) and records which, and for a Patch statement applies the diff, runs the reproduction and the suite, computes the scope from the diff's git headers as well as its hunks (so renames, mode changes, binary patches and submodule edits are \texttt{mixed}), and runs its own reviewer on a different model family when one is configured (recording \texttt{distinctFamily: false} honestly when it is not). It signs a DSSE receipt once per case, with \texttt{not-attempted} when admission control defers an identity that presents no verifiable ledger, which is the default, and records claimed and verified levels on the case and in the audit chain. The verified level is recorded; it does not by itself open a pull request, which the first draft claimed and the code never did.
+  \item \textbf{Receipts and verification at intake.} A submission may carry a statement. The intake verifies it against its own expectations (its harness digest for the running version), re-executes the reproduction at the subject revision in a clean sandbox, classifies the result from the runner's structured output (written to a per-run random path and cross-checked against the runner's own summary and exit code; it defends against honest error, not a hostile test, as Section~\ref{sec:provenance} says), checks that the test imported or covered the package the platform's repository configuration names (never a name the report supplies) and records which, and for a Patch statement applies the diff, runs the reproduction and the suite, computes the scope from the diff's git headers as well as its hunks (so renames, mode changes, binary patches and submodule edits are \texttt{mixed}), and runs its own reviewer on a different model family when one is configured (recording \texttt{distinctFamily: false} honestly when it is not). It signs a DSSE receipt once per case, with \texttt{not-attempted} when admission control defers an identity that presents no verifiable ledger, which is the default, and records claimed and verified levels on the case and in the audit chain. The verified level is recorded; it does not by itself open a pull request.
   \item \textbf{Ledger.} Countersigned DSSE entries per reporter identity and per track, appended when a case closes, with \texttt{accepted} reserved for cases that were published and \texttt{reproduced-unresolved} for the rest, an auditable reason on every negative outcome, never a \texttt{false-positive} over a receipt whose re-execution of the finder's own test matched, claimed and verified levels recorded only when the platform re-executed, and, per finder key and track, the root and count of the ledger the platform was shown plus the entries it countersigned, so that a history that rewrites the prefix or omits one of them is recorded as a fork while concurrent closes elsewhere are not. The rubric is computed on demand and the floors, admission limits, isolation class and pinned countersigners are published in the policy resource.
-  \item \textbf{Scoping.} The ledger endpoint returns only the caller's own entries; every read surface, including the audit trail, postmortem and advisory, withholds an embargoed case from anyone but its reporter and the maintainer (the third review found three of seven ungated); the embargoed statement names the repository by digest; admission counts only non-neutral countersigned outcomes, so a free \texttt{duplicate} makes no identity known; the hunter refuses to start without an explicit allowlist of authorised targets.
+  \item \textbf{Scoping.} The ledger endpoint returns only the caller's own entries; every read surface, including the audit trail, postmortem and advisory, withholds an embargoed case from anyone but its reporter and the maintainer; the embargoed statement names the repository by digest; admission counts only non-neutral countersigned outcomes, so a free \texttt{duplicate} makes no identity known; the hunter refuses to start without an explicit allowlist of authorised targets.
   \item \textbf{Environment adapters.} The Environment pillar is a pluggable attestor. The reference adapter is the signed-quote form; SEV-SNP and TDX quote verification are vendor-library integrations and are explicitly \emph{not} claimed as implemented. The deployment's patch agents call a model through an API, so its own statements cannot verify above \lvl{2} on the Environment pillar.
 \end{itemize}
 
@@ -826,9 +804,7 @@ so the comparison measures the badge and not the pipeline behind it.
 process and an existing stream of machine patches pins its intake and policy as the authoritative channel and
 receives attested patches on already-triaged bugs. In a \emph{staging} pilot, the hunter runs against a
 \emph{private} fork of a package ecosystem on self-hosted weights, attests every reproducible finding, and
-patches the fork. The first draft had the staging pilot notify upstream after a fixed window; that is the
-inverse of coordinated disclosure, and the guardrail it stated (``never earlier'') had the direction wrong.
-Each upstream is notified through its declared channel at discovery; the fork stays private; nothing about a
+patches the fork. Each upstream is notified through its declared channel at discovery; the fork stays private; nothing about a
 finding is published until upstream has shipped or its own deadline has passed; and there is no public
 ``hardened fork'', which would be a non-authoritative release of fixes by the paper's own T6.
 
@@ -837,8 +813,7 @@ authorisation basis in every statement and an explicit allowlist in the hunter's
 intake's re-execution with VM isolation on the operator's own hardware; the receipts name the isolation class, and
 a pilot whose receipts say \texttt{process} is not the pilot described here. The whole
 pipeline, not only the hunter, runs on self-hosted weights in the pilots, so that no partner source reaches a
-third-party model provider; the first draft claimed this while the default configuration sent source to an
-API. Results, including null results, will be published with rubric inputs in aggregate; per-case ledger
+third-party model provider; qudisclose's default configuration sends source to an API, so a pilot changes it. Results, including null results, will be published with rubric inputs in aggregate; per-case ledger
 entries name partner projects and timings and will not be published. Running a hunter against third-party
 code, even on a private fork, is lawful only under authorisation or safe harbour, and the paper says so
 rather than leave it implied.
@@ -875,10 +850,9 @@ trust from the operator to a chip vendor, or to the independence of two operator
 judgement of which measurements to allowlist; it proves which bytes ran and nothing about what they do.
 Transcript roots prove nothing about completeness below \lvl{3}. Re-execution is attacker-chosen code executed
 by the receiver before any trust exists; it is cheap next to a maintainer's hour only when it is isolated and
-admission-controlled, and the first draft listed neither requirement. The platform's key is the whole of
+admission-controlled. The platform's key is the whole of
 \lvl{2}, the design centralises it, and receipts rest on one clock until they are anchored. The rubric will be
-gamed; its second version closes the attacks its first version was shown to permit, and the specification
-lists the ones it still permits. A 7-day embargo with publication on fix is shorter than most distribution
+gamed; the specification lists the attacks it still permits. A 7-day embargo with publication on fix is shorter than most distribution
 rebuild cycles, so for a project with downstream distributions the fix is the zero-day; the embargo belongs to
 the maintainer's channel, not to the platform.
 
@@ -898,7 +872,7 @@ yet. The pilots in Section~\ref{sec:pilots} exist to produce it. A fifth is that
 first draft's verifier granting levels it had not checked in six places, a second-round review found ten more in
 the second draft by probing the artefacts rather than reading the prose, and a third round found the specification
 itself undecided on who owns a ledger's index and which clock governs validity, with the implementation forking
-honest finders as a result; each is now a failing test (Figure~\ref{fig:attacks}), and the reader should expect the
+honest finders as a result; each is now a failing test (Figure~\ref{fig:attacks}; Appendix~\ref{app:history}), and the reader should expect the
 next review to find more.
 
 \paragraph{Relation to other work.}
@@ -968,5 +942,50 @@ opinions are the author's.
 \bibitem{skillslsa} V. P. Bhardwaj. Formal analysis and supply chain security for agentic AI skills. arXiv:2603.00195, 2026.
 \bibitem{agentoutput} C. Koch. From agent output to authorized transition. arXiv:2609.28216, 2026.
 \end{thebibliography}
+
+\appendix
+\section{Revision history: what the reviews found}
+\label{app:history}
+
+This draft is the fourth. Five adversarial reviews over three rounds probed the artefacts (the verifier, the rubric,
+the ledger and the implementation) rather than the prose. Each attack below is a failing test in the reference suite
+(Figure~\ref{fig:attacks}); the body describes the design as it now stands.
+
+\paragraph{Round 1 (two reviews of the first draft).}
+\begin{itemize}
+  \item The threat table said ``defeated'' where only ``mitigated'' or ``recorded'' was true; both reviewers caught it.
+  \item Malicious reproduction was listed as ``sandbox escape'' and marked defeated by policy; there were no isolation or admission requirements.
+  \item The statement was called safe to publish during embargo while it carried the test path, command and files touched in plaintext; there was no embargoed profile.
+  \item The subject was called a deduplication key.
+  \item Several \lvl{2} and \lvl{3} checks were structural: the harness digest against the finder's own first leaf, the weight digest against the finder's own copy of an attestation.
+  \item The reference verifier granted Identity \lvl{2} on a self-reported history summary, and a ledger with garbage signatures scored like a real one.
+  \item The verifier pinned the enclave key instead of deriving it from the quote.
+  \item The paper said \lvl{3} was ``the same move \slsa{} Build \lvl{3} makes'', said the receipt settled ``who knew what, when'' without either party's cooperation, and said a finder could not present a trimmed history.
+  \item There was no key lifecycle.
+  \item Canonical JSON was ``sorted keys, no whitespace'', and three implementations disagreed on float formatting and on which fields a ledger signature covered.
+  \item The first implementation emitted a digest of a model's name as its weight digest, and classified failures by substring search.
+  \item The rubric counted duplicates as positives, penalised withdrawal, looked only at the most recent rejection, weighted calibration at a tenth, and let two colluding keys with five entries score $0.733$ on day zero.
+  \item The staging pilot notified upstream after a fixed window, and the pilot claimed self-hosted weights while the default configuration sent source to an API.
+  \item The paper claimed a verified level opens a pull request; the code never did.
+\end{itemize}
+
+\paragraph{Round 2 (second draft).} Ten more cases of the verifier granting what it had not checked, found by probing; among them:
+\begin{itemize}
+  \item The verifier accepted a receipt under any pinned key, including the finder's own, and read its re-execution result before checking who signed it.
+  \item A finder could borrow another finder's published ledger, or spend Finding history on the Patch track.
+  \item A finder-ordered window let reordering move a score from $0.37$ to $0.93$.
+  \item A two-operator quote co-signed twice by one root passed as two operators.
+  \item The classifier's limit: a hostile test can forge the runner's report, and \texttt{import subject; assert False} needs no forgery.
+  \item The second implementation enforced nothing about the bytes it signed.
+\end{itemize}
+
+\paragraph{Round 3 (third draft, revision 3).} Design questions the specification had not decided:
+\begin{itemize}
+  \item The closing platform assigned ledger sequence numbers, so two honest platforms forked a finder.
+  \item Key windows and revocations were judged at times the key holder wrote, so a revoked key verified a statement whose finish time predated the revocation; the rubric was recomputed at the verifier's wall clock.
+  \item A signed timestamp could stand in for log inclusion.
+  \item The key lifecycle was specified but not implemented.
+  \item Three of seven read surfaces in qudisclose did not gate embargoed cases.
+\end{itemize}
 
 \end{document}
