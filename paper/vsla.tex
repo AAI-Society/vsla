@@ -161,7 +161,7 @@ failing test.
   \item[\ref{sec:verification} \, Verification and the rubric.] How a claimed level becomes a verified one, which checks are external, and the score within a level. Start here if you will verify.
   \item[\ref{sec:impl} \, Implementation.] qudisclose as finder and platform (Figure~\ref{fig:qudisclose}).
   \item[\ref{sec:pilots} \, Pilots.] What will be measured, paired with the safety metrics that keep ``merged faster'' honest.
-  \item[\ref{sec:discussion} \, Discussion.] Trust the badge, ledgers instead of bounties, the provider's asymmetric risk, and the limits this paper inherits and leaves.
+  \item[\ref{sec:discussion} \, Discussion.] Trust the badge, what a level tells whom, who goes first, ledgers instead of bounties, the provider's asymmetric risk, and the limits this paper inherits and leaves.
 \end{description}
 \end{minipage}
 
@@ -855,6 +855,25 @@ level is evidence about this disclosure, not a prediction about the next one. Th
 the effect commit rights have on contributors: precision is rewarded with less friction, and nothing else is
 rewarded. Alert fatigue does not disappear at \lvl{1}; it moves from ``read the report'' to ``read the test'',
 which is why maintainer minutes should be measured per level.
+
+\paragraph{What a level tells whom.} \slsa{} provenance matters because a consumer cannot cheaply rebuild what it
+installs. A \vsla{} receiver must re-run the test anyway (\lvl{2} requires it), so for the platform that did the
+re-execution, Evidence \lvl{2} reports its own work back to it. What the finder supplies that the receiver could not
+produce for itself is the transcript commitment, the MBOM and, above all, the countersigned ledger: for a direct
+receiver the value of a statement is mostly on the Identity pillar, which is what lets it decide whom to re-execute
+first and how much admission to grant. The Evidence pillar earns its keep for everyone downstream of that receiver:
+a maintainer reading a platform's receipt rather than running the test, a coordinator without the code, an auditor a
+year later. The paper should not be read as claiming that a statement spares the receiver its own run; it spares
+everyone after the receiver theirs.
+
+\paragraph{Who goes first.} \lvl{2} needs three things that do not exist at scale today: codebases that declare a
+machine intake as their authoritative channel (almost none does; \texttt{SECURITY.md} and \texttt{security.txt}
+name inboxes), platforms that run VM-isolated re-execution and countersign receipts and outcomes, and countersigners
+that readers pin. Each is worth little without the others. Until a second, independent platform pins the first, every
+finder's ledger is single-platform and, under the two-countersigner floor, below \lvl{2} everywhere except where a
+maintainer countersigns directly. The pilots are the first instance of the network, not evidence that it will form.
+We expect the first network that matters to be one ecosystem's registry or foundation running an intake for its
+projects and pinning a few others, and we would rather say so than imply that the network appears on its own.
 
 \paragraph{Ledgers instead of bounties.} Bounties pay for findings and so reward volume and first-to-file;
 machine finders have no rent to pay and no ego to bruise, which removes the pressure that made bounties
