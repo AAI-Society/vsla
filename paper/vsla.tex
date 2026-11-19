@@ -206,7 +206,7 @@ what this paper contributes, is:
 
 \begin{enumerate}
   \item A graded trust framework for the \emph{disclosure} rather than for the code, the agent or the run, with separate Finding and Patch tracks (Section~\ref{sec:framework}), and a threat model for machine-to-machine disclosure (Section~\ref{sec:threats}) that names the attacks the human process has no vocabulary for: cherry-picked transcripts, substituted models, forged provenance, tampered weights, and a model provider's asymmetric knowledge.
-  \item The evidence rule that separates the levels: a finding's evidence is a test \emph{executed by code} that fails by assertion at the subject revision, and \lvl{2} requires that the \emph{receiver} re-executed it, classified it and checked that it loaded the code it names. The ``AI slop'' literature describes the problem and proposes a score for polish versus substance~\cite{slopsurvey}; we make execution a mechanical, signable requirement, and say plainly that it proves reproducibility, not validity.
+  \item The evidence rule that separates the levels: a finding's evidence is a test \emph{executed by code} that fails by assertion at the subject revision, and \lvl{2} requires that the \emph{receiver} re-executed it, classified it, checked that it loaded the code it names, and ran the unchanged test at a \emph{control} where it must pass, so a test that fails on demand is caught. The ``AI slop'' literature describes the problem and proposes a score for polish versus substance~\cite{slopsurvey}; we make execution a mechanical, signable requirement, and say plainly that it proves reproducibility and, with the control, that the test discriminates, not that the bug is real.
   \item A provenance predicate (Section~\ref{sec:provenance}) that puts a model bill of materials in every disclosure, so a bad model can be traced to every finding it touched, and that commits to the transcript with a Merkle tree so a single turn can be proven without releasing the prompts.
   \item The platform \emph{receipt}, a separate countersignature over statement digest, channel, time and the platform's own re-execution, review and scope result, which counts only under the platform key the statement itself names and which a third-party verifier requires to be anchored by log inclusion; and a trust ledger whose index its owner assigns, whose entries are countersigned by the party that bore the cost of the report, bound to the finder's key and to the track, and count only with readers who have pinned that party, which is what lets a ledger replace a bounty without becoming a forgeable or transferable credential.
   \item A verification procedure (Section~\ref{sec:verification}) in which a claimed level is recomputed by the receiver from what it can check against its own pinned keys and expectations, every check is marked external or structural, every time-dependent check is judged at one instant fixed by the anchor rather than by the party being checked, a self-reported value never substitutes for an input, and a coordinator without the code lands, honestly, at \lvl{1}.
@@ -306,9 +306,11 @@ slop'' as automatically generated security artifacts and proposes a Slop-Score f
 verifiable substance~\cite{slopsurvey}; and the Cloud Security Alliance notes that when bounties become
 economically unviable, open-source maintainers lose their main channel for outside reports~\cite{csadisclosure}.
 The same period produced the counter-example: AI tooling found and upstreamed every CVE in one curl release,
-all accepted by the maintainers~\cite{herodevsguide}. \vsla{} is the mechanism that lets a maintainer tell those
-two cases apart before reading the report, because the second one can carry a failing test re-run by code and
-the first cannot.
+all accepted by the maintainers~\cite{herodevsguide}. \vsla{} is meant to help a maintainer tell those two cases apart
+before reading the report. A failing test alone does not do it, since a slop report can carry
+\texttt{assert False} as easily as a real one carries a real test; what separates them at \lvl{2} is a test the
+receiver re-ran that fails at the subject revision \emph{and} passes, unchanged, at a control, and after that the
+finder's countersigned record.
 
 \paragraph{\slsa{}-style tiers for agent artifacts.}
 A graduated model that maps trust scores to four levels, from unsigned to formally verified, and lets enterprise
@@ -359,10 +361,12 @@ was built to prevent.
 does not exist; its cost is an hour of a maintainer's attention, and at scale it is the whole alert-fatigue
 problem. \lvl{1} mitigates it by requiring a test that was executed, which removes reports that were never run;
 \lvl{2} mitigates it further by having the receiver run the test itself, classify the failure with its own
-classifier and check that the test loaded the package the receiver's own configuration names. Neither defeats it:
-a finder can write a test that fails on demand, \texttt{import subject; assert False} clears both checks, and the
-runner's report that the classifier reads is written inside the process the hostile test runs in; the classifier
-filters honest error, and \lvl{1} proves reproducibility, not validity. An \emph{edited transcript} (T2)
+classifier and check that the test loaded the package the receiver's own configuration names. \lvl{1} alone does not stop a finder that writes a test that fails on demand: \texttt{import subject; assert False}
+clears its checks, and the runner's report that the classifier reads is written inside the process the hostile
+test runs in, so the classifier filters honest error only. \lvl{2} therefore also runs the unchanged test at a
+\emph{control} where it must pass, a reference revision or the subject with a candidate fix applied; a test whose
+verdict does not depend on the subject has no passing control. Neither level defeats T1: a test that discriminates
+can still assert the wrong thing, and \lvl{1} proves reproducibility, not validity. An \emph{edited transcript} (T2)
 is defeated at \lvl{1} by the Merkle root, but a transcript with turns \emph{omitted} before the root was signed
 is invisible to any root; only a recorder inside a measured harness (\lvl{3}) can attest completeness, and the
 figure lists the two separately. A \emph{forged or replayed statement} (T3) and an \emph{over-claimed level}
@@ -474,7 +478,8 @@ finder wrote the test and set the flag.
 \textbf{\lvl{2} Trusted}: an authoritative platform received it, re-checked it, and the finder has a
 countersigned record. The disclosure went to the channel the codebase declares; the platform re-executed the
 reproduction in its own isolated sandbox at the subject revision, classified the failure with its own
-classifier, checked that the test loaded the package the platform names for that repository, and signed a receipt
+classifier, checked that the test loaded the package the platform names for that repository, ran the unchanged test
+at a control where it must pass, and signed a receipt
 binding statement digest, channel, time and that result (Figure~\ref{fig:evidence}); on the Patch track the
 platform also ran its own adversarial review on a different model family and computed that the diff touches source
 only. The finder's trust ledger, an append-only log of past disclosures with countersigned outcomes, was supplied in
@@ -516,7 +521,7 @@ trust statement again: ``neither of two operators alone'' rather than ``not the 
 
 \begin{figure}[htbp]
   \centering\includegraphics[width=\linewidth]{../figures/pdf/fig-evidence.pdf}
-  \caption{What the Evidence pillar checks on the Finding track. \lvl{1} is the finder's own code-executed account; \lvl{2} is the receiver's re-execution at the subject revision with its own classifier and coverage check. Neither proves the bug is real: a finder can fail on demand, and the semantic judgement remains the receiver's.}
+  \caption{What the Evidence pillar checks on the Finding track. \lvl{1} is the finder's own code-executed account; \lvl{2} is the receiver's re-execution at the subject revision with its own classifier and coverage check, plus a control run where the unchanged test must pass. Neither proves the bug is real: the control rejects a test that fails on demand, not one that asserts the wrong thing, and the semantic judgement remains the receiver's.}
   \label{fig:evidence}
 \end{figure}
 
@@ -613,7 +618,9 @@ collected test failed by assertion; no collection, import, fixture or timeout er
 output, which is what the first implementation did. The second review showed the limit of that rule: the runner
 writes its report inside the process the test runs in, so a hostile test can forge it, and a test that imports the
 subject and asserts false needs no forgery at all. The classifier filters honest error, and the specification now
-says so; the semantic judgement is the receiver's.
+says so. What catches a test that fails on demand is the \emph{control}: at \lvl{2} the receiver also runs the
+unchanged test at a reference revision or with a candidate fix applied, and it must pass there. That shows the
+test's verdict depends on the subject; whether what it detects is a vulnerability is still the receiver's judgement.
 
 \paragraph{Receipt.} The platform's countersignature is a separate DSSE object (Figure~\ref{fig:receipt}), not a
 third signature on the envelope, so that the finder's payload is never modified after it is signed. The platform

@@ -231,6 +231,24 @@ def test_receiver_classifier_and_subject_coverage_gate_l2():
     assert res.verified == 1 and res.pillars["evidence"].failed == "E7"
 
 
+def test_finding_l2_requires_a_passing_control_execution():
+    """VSLA-P-4 control: `import subject; assert False` fails at every revision, so a re-execution that only shows the
+    test failing cannot tell it from a real finding. E7 also needs the unchanged test to pass at a control (a reference
+    revision or a candidate fix), which shows the verdict depends on the subject's behaviour."""
+    kw = inputs("finding-l2"); kw.pop("receipt")
+    rx = load("reexecution.json")
+    assert rx["control"]["passed"] is True and rx["control"]["testUnchanged"] is True
+    res = v.verify(load("finding-l2.dsse.json"), **kw)
+    assert check(res, "E7").ok and res.pillars["evidence"].level >= 2 and "control=candidate-fix:passed" in check(res, "E7").detail
+    for bad in ({k: x for k, x in rx.items() if k != "control"},                   # no control: the test may fail on demand
+                {**rx, "control": {**rx["control"], "passed": False}},           # fails everywhere: assert False
+                {**rx, "control": {**rx["control"], "testUnchanged": False}},    # the "fix" edited the test
+                {**rx, "control": {**rx["control"], "kind": "finder-asserted"}}):
+        kw["reexecution"] = bad
+        res = v.verify(load("finding-l2.dsse.json"), **kw)
+        assert res.verified == 1 and res.pillars["evidence"].failed == "E7"
+
+
 def test_required_isolation_class_gates_e7():
     """VSLA-P-11: a policy that requires vm isolation does not accept a re-execution in a process sandbox."""
     kw = inputs("finding-l2"); kw.pop("receipt")

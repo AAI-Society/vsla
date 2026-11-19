@@ -289,6 +289,18 @@
             "touchedSubject": { "type": "boolean", "description": "the re-executed test imported or covered the package the platform's own configuration names (never a name the finder wrote); rejects a test that never loads the subject, proves nothing about the path it exercised" },
             "touchedSubjectMeans": { "enum": ["imported", "covered"], "description": "how touchedSubject was decided" },
             "outputDigest": { "$ref": "#/$defs/digestSet" },
+            "control": {
+              "description": "Finding track (VSLA-P-4): the platform ran the same, unchanged test at a control where it must pass, a reference revision or the subject revision with a candidate fix applied; a test that fails at every revision has no passing control",
+              "type": "object",
+              "required": ["kind", "testUnchanged", "passed"],
+              "properties": {
+                "kind": { "enum": ["reference-revision", "candidate-fix"] },
+                "revision": { "type": "string", "description": "reference-revision: the commit the test passed at" },
+                "diffDigest": { "$ref": "#/$defs/digestSet", "description": "candidate-fix: the diff applied to the subject revision" },
+                "testUnchanged": { "type": "boolean", "description": "the control diff touches no file the test reads, and the test digest is the one re-executed" },
+                "passed": { "type": "boolean" }
+              }
+            },
             "applied": { "type": "boolean" },
             "reproductionPasses": { "type": "boolean" },
             "suitePasses": { "type": "boolean" },
