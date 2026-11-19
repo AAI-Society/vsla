@@ -9,7 +9,7 @@ adds the receipt and the record; L3 adds the environment. A signed report is L0 
 No. L1 proves that a finder-authored test fails reproducibly at the named revision and that the finder signed
 a complete account of the run. A finder can write a test that fails on demand. The first check that speaks to
 whether the bug is real is the receiver's own re-execution at L2, with the receiver's own classifier and a
-check that the test actually exercised the code the report names, and even that proves "this test fails for
+check that the test loaded the package the receiver's own configuration names (never one the report names), and even that proves "this test fails for
 an assertion in this code", not "this is exploitable". The semantic judgement is still the receiver's.
 
 **Why a model bill of materials?**

@@ -19,7 +19,7 @@ The claim: the codebase at the stated revision contains the stated vulnerability
 | Level | Added requirement |
 |---|---|
 | L1 | A test that fails on the vulnerable revision with an assertion (per the normative classifier, not a collection error or missing import), re-run by code at the subject revision; MBOM; Merkle transcript with measure and verify leaves; authorization basis; signed statement |
-| L2 | Re-executed by the receiving platform in its own isolated sandbox at the subject revision, classified by the platform, with the test shown to touch the code the report names; receipt countersigned; finder's ledger verified against pinned countersigners and meets every floor |
+| L2 | Re-executed by the receiving platform in its own isolated sandbox at the subject revision, classified by the platform, with the test shown to load the package the platform's own configuration names; receipt countersigned; finder's ledger verified against pinned countersigners and meets every floor |
 | L3 | Reproduction executed inside the attested environment; sandbox digest bound into the quote |
 
 ## Patch track

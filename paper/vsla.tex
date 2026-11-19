@@ -447,7 +447,9 @@ compare against.
 Every verification check is also marked \emph{external} or \emph{structural}. An external check compares the
 statement against something the finder did not write: a pinned key, an expectation the receiver obtained
 independently, or the receiver's own execution. A structural check compares the statement against itself.
-Only external checks separate the levels. The first draft's verifier had several \lvl{2} and \lvl{3} checks that
+Only external checks separate the levels. On the Environment pillar, \lvl{1} asks only that every model declare its serving mode (N1), and
+\lvl{2} that the measured harness match the receiver's own expectation for that harness version (N2); below \lvl{3}
+that measurement is the finder's own, so N2 catches honest drift, not fraud, until a quote binds it. The first draft's verifier had several \lvl{2} and \lvl{3} checks that
 were structural (the finder's harness digest against the finder's own first leaf; the finder's weight digest
 against the finder's own copy of a ``provider attestation''), which is the \slsa{} mistake of verifying
 provenance without expectations; the distinction is now explicit in the procedure and in every verification
@@ -907,8 +909,8 @@ of Section~\ref{sec:framework} about where the analogy breaks. It composes rathe
 Section~\ref{sec:related}: an in-toto AI code-generation predicate can accompany a Patch statement, a
 NovaFabric-style run log can be the sealed body behind the transcript root, a TEE deployment in the style
 of~\cite{teegrant} satisfies the Environment pillar, and an AgentReputation-style store can host the ledger as
-long as entries carry receiver countersignatures. The level is orthogonal to CVSS and CWE, which describe the
-bug, and to OSV and CVE, which name it.
+long as entries carry receiver countersignatures. The level is orthogonal to CVSS~\cite{cvss} and CWE, which describe the
+bug, and to OSV~\cite{osv} and CVE, which name it.
 
 \section{Conclusion}
 

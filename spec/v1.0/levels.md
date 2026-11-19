@@ -61,8 +61,8 @@ Everything in L1, plus:
   receipt** binding the receipt time and the channel, anchored in a transparency log where the platform
   offers one;
 - the platform **independently re-executed** the reproduction in its own isolated sandbox, at the subject
-  revision, classified the failure with its own classifier, checked that the test exercised the code the
-  report names, and put the result in the receipt. The finder's word about the exit code is no longer the
+  revision, classified the failure with its own classifier, checked that the test loaded the package its own
+  configuration names for the repository (never a name taken from the report), and put the result in the receipt. The finder's word about the exit code is no longer the
   only word. On the Patch track the platform also ran its own adversarial review on a different model family,
   and the diff touches source only;
 - the finder has a **trust ledger**: an append-only log of its past disclosures, each with an outcome
