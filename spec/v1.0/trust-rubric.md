@@ -1,4 +1,4 @@
-# Trust rubric (v1.1)
+# Trust rubric (v1.2)
 
 A level is a floor; the **score** is a number within a level that lets a platform rank, route and rate-limit
 finders, and that sets the L2 floor. The rubric is deliberately simple so that two platforms compute the same
@@ -15,11 +15,11 @@ the evaluation instant `t_eval` ([VSLA-V-7](requirements.md)):
 
 | Symbol | Meaning |
 |---|---|
-| `n` | counted entries in the window: outcomes `accepted` (including `vouched`), `rejected`, `false-positive`, and the disqualifying outcomes. **Neutral** outcomes (`duplicate`, `withdrawn`, `reproduced-unresolved`) are excluded from the window entirely, so they can neither pump nor sink the score |
-| `a` | outcomes `accepted` that are not `vouched` |
+| `n` | counted entries in the window: outcomes `accepted` (not `vouched`), `rejected`, `false-positive`, and the disqualifying outcomes. **Neutral** outcomes (`duplicate`, `withdrawn`, `reproduced-unresolved`) are excluded from the window entirely, so they can neither pump nor sink the score |
+| `a` | outcomes `accepted` (a `vouched` entry is not an outcome and is in neither `n` nor `a`) |
 | `r_i` | the age in days of each `rejected` or `false-positive` entry |
 | `x` | outcomes `non-authoritative-release`, `retracted`, `ledger-fork` (disqualifying) |
-| `m` | distinct pinned countersigners, counted per operator: the name part of the keyid (`platform:acme.example` and `maintainer:acme.example` are one countersigner) |
+| `m` | distinct pinned countersigners, counted per operator, including maintainers who vouched: the name part of the keyid (`platform:acme.example` and `maintainer:acme.example` are one countersigner) |
 | `o` | over-claims: entries where `claimed > verified` |
 | `age` | days since the oldest counted entry in the window |
 
@@ -30,7 +30,7 @@ precision   P = a / n
 breadth     B = min(1, m / 3)
 seasoning   S = min(1, age / 90) · min(1, n / 10)
 calibration C = max(0, 1 - 2·o / n)
-recency     R = 1 - 0.5 · min(1, Σ_i exp(-r_i / 30))
+recency     R = 1 - 0.5 · min(1, Σ_i exp(-r_i / 30) / max(1, n / 10))
 
 score = 0 if x > 0 or o / n ≥ 1/2, else  P · (0.5 + 0.2·B + 0.2·S + 0.1·C) · R
 ```
@@ -41,10 +41,16 @@ decay instead of looking only at the most recent one (ten rejections last month 
 twice as steep and disqualifies at half the window (over-claiming every statement cost 0.1 before); and the
 floors gained a hard age gate (two colluding keys and five entries could reach the floor on day zero).
 
+What changed in v1.2 and why: recency is divided by `max(1, n/10)`, because one fresh rejection halved the score
+whatever the history, so a single negative entry from any pinned platform dropped a finder with 49 acceptances to
+0.49, below the floor, for about a week (T22); it now costs that finder about a tenth, while one rejection in five
+entries costs what it did. And a vouch counts toward `m` only: it counted toward `n` but not `a`, so a maintainer
+vouching for a finder *lowered* its precision.
+
 The shipped example ledger ([`schema/examples/ledger.json`](../../schema/examples/ledger.json)): 13 entries, of
 which 2 duplicates are excluded, leaving `n = 11`; 10 accepted; 1 rejection 83 days ago; 3 pinned
-countersigners; 138 days of history; 1 over-claim. `P = 0.909`, `B = 1`, `S = 1`, `C = 0.818`, `R = 0.969`:
-`0.909 · (0.5 + 0.2 + 0.2 + 0.082) · 0.969 = 0.865`. The reference verifier and the examples agree on this
+countersigners; 138 days of history; 1 over-claim. `P = 0.909`, `B = 1`, `S = 1`, `C = 0.818`, `R = 1 - 0.5 · e^(-83/30) / 1.1 = 0.971`:
+`0.909 · (0.5 + 0.2 + 0.2 + 0.082) · 0.971 = 0.867`. The reference verifier and the examples agree on this
 number to four places.
 
 ## Floors
@@ -65,8 +71,8 @@ below 14.
 A new finder has no ledger and so no L2. That is intended: L2 is earned. The path is to disclose at L1 to
 platforms that accept L1 (qudisclose does, into the `scheduled` lane with human review of the patch), collect
 countersigned outcomes, and cross the floor after the age gate. A platform MAY let a maintainer vouch for a
-finder (a countersigned `accepted` entry with `vouched: true`), which counts toward `n` and `m` but not toward
-`a`. An honest finder that discloses to a single platform has one countersigner and cannot reach L2 at that
+finder (a countersigned `accepted` entry with `vouched: true`), which counts toward `m` and toward nothing
+else, so a vouch can supply the second countersigner without lowering precision. An honest finder that discloses to a single platform has one countersigner and cannot reach L2 at that
 platform until a maintainer countersigns directly or vouches; that is a cost of the two-countersigner floor,
 and the spec accepts it rather than count self-countersigned entries twice.
 

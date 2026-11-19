@@ -663,7 +663,7 @@ def trust_score(entries: list[dict[str, Any]], *, window: int = 50, now_days: fl
     verified?, kind?, vouched?}); the caller has already dropped entries whose countersignature did not verify. The
     window is the last W entries by countersigned `at`, so presented order cannot move the score. Neutral outcomes
     (duplicate, withdrawn, reproduced-unresolved) are excluded from the window entirely so they can neither pump nor
-    sink the score. `m` counts distinct operators, not keyids. `now_days` is the evaluation instant (a verifier passes
+    sink the score. Vouches count toward `m` only. Recency is scaled by `max(1, n/10)`. `m` counts distinct operators, not keyids. `now_days` is the evaluation instant (a verifier passes
     `t_eval`, so the score is a function of the inputs, not of the verifier's clock). `at` may be a day number (tests)
     or an ISO timestamp."""
 
@@ -673,16 +673,20 @@ def trust_score(entries: list[dict[str, Any]], *, window: int = 50, now_days: fl
         return datetime.fromisoformat(str(v).replace("Z", "+00:00")).timestamp() / 86400
 
     ents = [e for e in entries if e.get("countersigner") and e.get("kind", "outcome") == "outcome" and e.get("outcome") not in NEUTRAL]
+    # a vouch is a countersigner's endorsement, not an outcome: it adds to m and nothing else
+    vouches = [e for e in ents if e.get("vouched") and e.get("outcome") == "accepted"]
+    ents = [e for e in ents if not (e.get("vouched") and e.get("outcome") == "accepted")]
+    vouchers = {countersigner_operator(e["countersigner"]) for e in vouches}
     ents = sorted(enumerate(ents), key=lambda ie: (days(ie[1]["at"]), ie[0]))      # window by countersigned time, not presented order
     ents = [e for _, e in ents][-window:]
     n = len(ents)
     if n == 0:
-        return {"score": 0.0, "n": 0, "accepted": 0, "rejected": 0, "disqualifying": 0, "countersigners": 0, "over_claims": 0,
+        return {"score": 0.0, "n": 0, "accepted": 0, "rejected": 0, "disqualifying": 0, "countersigners": len(vouchers), "over_claims": 0,
                 "age_days": 0.0, "components": {}, "reason": "no countersigned entries"}
     now = now_days if now_days is not None else datetime.now(UTC).timestamp() / 86400
-    a = sum(e["outcome"] == "accepted" and not e.get("vouched") for e in ents)
+    a = sum(e["outcome"] == "accepted" for e in ents)
     x = sum(e["outcome"] in DISQUALIFYING for e in ents)
-    m = len({countersigner_operator(e["countersigner"]) for e in ents})
+    m = len({countersigner_operator(e["countersigner"]) for e in ents} | vouchers)
     o = sum(1 for e in ents if e.get("claimed") is not None and e.get("verified") is not None and e["claimed"] > e["verified"])
     age = max(0.0, now - min(days(e["at"]) for e in ents))
     neg_ages = [max(0.0, now - days(e["at"])) for e in ents if e["outcome"] in NEGATIVE]
@@ -690,7 +694,7 @@ def trust_score(entries: list[dict[str, Any]], *, window: int = 50, now_days: fl
     B = min(1.0, m / 3)
     S = min(1.0, age / 90) * min(1.0, n / 10)
     C = max(0.0, 1 - 2 * o / n)
-    R = 1 - 0.5 * min(1.0, sum(math.exp(-d / 30) for d in neg_ages))
+    R = 1 - 0.5 * min(1.0, sum(math.exp(-d / 30) for d in neg_ages) / max(1.0, n / 10))   # one rejection weighs less in a longer history
     disqualified = x > 0 or o / n >= 0.5
     score = 0.0 if disqualified else P * (0.5 + 0.2 * B + 0.2 * S + 0.1 * C) * R
     return {"score": round(score, 4), "n": n, "accepted": a, "rejected": len(neg_ages), "disqualifying": x,

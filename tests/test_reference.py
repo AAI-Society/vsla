@@ -478,7 +478,7 @@ def test_trust_score_rubric_v11():
     bodies, _ = v.verified_ledger(load("ledger.json"), ring)
     ts = v.trust_score(bodies, now_days=T0_DAYS)
     assert ts["n"] == 11 and ts["accepted"] == 10 and ts["rejected"] == 1 and ts["countersigners"] == 3 and ts["over_claims"] == 1
-    assert abs(ts["score"] - 0.8645) < 1e-3
+    assert abs(ts["score"] - 0.8671) < 1e-3
     assert v.trust_score([], now_days=T0_DAYS)["score"] == 0.0
     # neutral outcomes neither pump nor sink; disqualifying outcomes zero the score; withdrawing is not penalised
     dup = [*bodies, *[{**bodies[0], "outcome": "duplicate"} for _ in range(20)]]
@@ -492,9 +492,27 @@ def test_trust_score_rubric_v11():
     one = [*bodies, {**bodies[-1], "outcome": "rejected"}]
     ten = [*bodies, *[{**bodies[-1], "outcome": "rejected"} for _ in range(10)]]
     assert v.trust_score(ten, now_days=T0_DAYS)["score"] < v.trust_score(one, now_days=T0_DAYS)["score"]
-    # a vouch counts toward n and m but not toward accepted
+    # a vouch adds a countersigner (m) but is not an outcome: it neither counts toward n nor lowers precision
     vouched = [{**bodies[0], "vouched": True, "countersigner": "maintainer:new/project"}]
-    assert v.trust_score(vouched, now_days=T0_DAYS)["accepted"] == 0 and v.trust_score(vouched, now_days=T0_DAYS)["n"] == 1
+    assert v.trust_score(vouched, now_days=T0_DAYS)["accepted"] == 0 and v.trust_score(vouched, now_days=T0_DAYS)["n"] == 0
+    two = [b for b in bodies if b["countersigner"] == bodies[0]["countersigner"] and b["outcome"] == "accepted"]
+    with_vouch = v.trust_score([*two, *vouched], now_days=T0_DAYS)
+    assert with_vouch["countersigners"] == v.trust_score(two, now_days=T0_DAYS)["countersigners"] + 1
+    assert with_vouch["components"]["P"] == 1.0
+
+
+def test_one_rejection_weighs_by_history_size():
+    """Recency is scaled by n: one fresh rejection against 49 acceptances must not drop an established finder below the
+    floor (it did: score 0.49), while one against four still does, and ten recent rejections still hurt more than one."""
+    base = {"outcome": "accepted", "track": "finding", "claimed": 2, "verified": 2}
+    cs = ["platform:a.example", "maintainer:b.example", "platform:c.example"]
+    def ledger(n_acc):
+        return [{**base, "countersigner": cs[i % 3], "at": T0_DAYS - 200 + i} for i in range(n_acc)]
+    fresh = {**base, "outcome": "rejected", "countersigner": cs[0], "at": T0_DAYS}
+    assert v.meets_floor(v.trust_score([*ledger(49), fresh], now_days=T0_DAYS))[0]
+    assert not v.meets_floor(v.trust_score([*ledger(4), fresh], now_days=T0_DAYS))[0]
+    ten = v.trust_score([*ledger(49), *[fresh] * 10], now_days=T0_DAYS)["score"]
+    assert ten < v.trust_score([*ledger(49), fresh], now_days=T0_DAYS)["score"]
 
 
 def test_revoked_finder_key_fails_i1():
