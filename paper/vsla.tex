@@ -184,7 +184,9 @@ also a model.
 The qudisclose project~\cite{qudisclose} is one instance of the new shape: a researcher's agent submits a
 report over the Model Context Protocol, a team of agents acknowledges in seconds, reproduces, patches,
 reviews, publishes, and writes the postmortem, with a 7-day embargo cap instead of 90 and the embargo ending the
-moment the fix ships. Building it exposed a question the human process never had to answer precisely:
+moment the fix ships. That embargo is qudisclose's default, not part of \vsla{}: the framework takes no position on
+embargo length, which belongs to the maintainer's channel, and Section~\ref{sec:discussion} explains why a 7-day,
+publish-on-fix default is wrong for any project with downstream distributions. Building it exposed a question the human process never had to answer precisely:
 \emph{on what basis should one machine believe another machine's claim that a bug exists, that a model found
 it, that the account of how it was found is complete, and that the fix is correct?} The human process answered
 with reputation, email headers and good faith. None of those survive contact with a thousand findings a day.
@@ -878,9 +880,12 @@ by the receiver before any trust exists; it is cheap next to a maintainer's hour
 admission-controlled, and the first draft listed neither requirement. The platform's key is the whole of
 \lvl{2}, the design centralises it, and receipts rest on one clock until they are anchored. The rubric will be
 gamed; its second version closes the attacks its first version was shown to permit, and the specification
-lists the ones it still permits. A 7-day embargo with publication on fix is shorter than most distribution
-rebuild cycles, so for a project with downstream distributions the fix is the zero-day; the embargo belongs to
-the maintainer's channel, not to the platform.
+lists the ones it still permits. qudisclose's default of a 7-day embargo with publication on fix is shorter than most distribution
+rebuild cycles, so for a project with downstream distributions the fix is the zero-day. \vsla{} does not set an
+embargo and does not reward a short one: no outcome, floor or score term depends on embargo length, and the only
+embargo rule in the specification is that a finder must not release before the maintainer's embargo ends
+(VSLA-F-12). A platform that runs on a maintainer's behalf should take the embargo from the maintainer's policy,
+including any coordination with distributions, rather than impose its own.
 
 \paragraph{Gaps we inherit, and gaps we leave.}
 Three limits come straight from the related work and \vsla{} does not escape them. Attestation is not
@@ -912,7 +917,7 @@ bug, and to OSV and CVE, which name it.
 
 \section{Conclusion}
 
-Disclosure norms built around inboxes and a 90-day clock cannot carry the volume that machine finders
+Disclosure norms built around inboxes cannot carry the volume that machine finders
 produce, and machine receivers need something more precise than reputation to act on. \vsla{} gives both sides
 one word, backed by evidence either can re-check against keys and expectations of their own choosing:
 Attested, Trusted, or Hardened. It also says, for each threat, whether that word defeats, mitigates or merely
