@@ -75,6 +75,15 @@ that report, and `import subject; assert False` satisfies both the classifier an
 forging anything. That is why L2 says "somebody other than the finder reproduced it" and nothing stronger, and
 why the Patch track, whose test must pass after the fix, is the track with a differential check.
 
+**Can a fuzzer crash, a sanitizer report or a hang be a VSLA finding?**
+Yes, through a wrapper. The classifier counts failures by assertion and rejects collection, import, fixture and
+timeout errors, so a reproducer that segfaults the runner, or hangs until the runner's own timeout, is an
+environment error. VSLA-F-5 therefore asks for a test that runs the crashing input in a child process (built with
+the sanitizer the finding needs, under a stated time limit) and asserts that the child exits normally with no
+sanitizer report. The crash becomes an assertion failure in the test, the receiver's classifier and re-execution
+apply unchanged, and the fixed code makes the same test pass. The rule is written in pytest's vocabulary but
+applies to any runner with a structured report: JUnit XML, TAP, `go test -json`, `cargo test`, CTest.
+
 **What stops the receiving platform from executing a hostile proof of concept?**
 Nothing but its own isolation, which is why the spec now requires it: no network egress, no access to the
 signing keys, token issuer, database or other cases, resource caps, a distinct principal, and VM-level
