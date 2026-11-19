@@ -467,7 +467,9 @@ digest of the loaded weight bytes or an explicit \texttt{unmeasured}, a Merkle-r
 leaf measures the harness and whose verification leaf records the test run, and a reproduction executed by
 code at the subject revision: a test, the command, the exit code, and a classification of the failure by a
 normative rule (at least one collected test failed by assertion; no collection, import, fixture or timeout
-error). \lvl{1} buys the receiver a report it can reject mechanically if it is incomplete, replayed, or edited
+error). A crash, sanitizer report or hang, which is what a fuzzer produces, is carried by a test that runs the
+reproducer in a child process and asserts it terminates normally, so it too fails by assertion; the rule is read
+against any runner's structured report, not only pytest's. \lvl{1} buys the receiver a report it can reject mechanically if it is incomplete, replayed, or edited
 after signing, and a test it can run with one command. It buys no reason to believe the bug is real: the
 finder wrote the test and set the flag.
 
