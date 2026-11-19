@@ -180,7 +180,7 @@ self-hosted weights. Details in the [paper](paper/vsla.pdf), section 9.
 ```
 spec/v1.0/        levels · tracks · requirements (VSLA-F/P/V ids) · provenance · verification · threats · trust-rubric · faq
 schema/           vsla-provenance-v1.schema.json · examples/ (signed statements, DSSE receipts, keyring, expectations, ledger, leaves)
-tools/            vsla_verify.py (reference verifier: RFC 8785 JSON, Merkle, DSSE, rubric v1.1) · make_examples.py
+tools/            vsla_verify.py (reference verifier: RFC 8785 JSON, Merkle, DSSE, rubric v1.2) · make_examples.py
 paper/            vsla.tex → vsla.pdf (tectonic) · build_docx.py → vsla.docx (for comments)
 figures/          build_figures.py · style.py · fig-*.svg · pdf/ (for the paper)
 assets/           logo.svg · banner.svg

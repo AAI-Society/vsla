@@ -747,11 +747,11 @@ the specification now says who owns the ledger's index and which clock governs v
 rate-limit and that sets the \lvl{2} floor. After dropping entries whose countersignature does not verify under
 a pinned key, and excluding \emph{neutral} outcomes (duplicate, withdrawn, reproduced-unresolved) from the
 window entirely, over the last $W=50$ counted entries with $n$ entries,
-$a$ accepted (not vouched), $m$ distinct pinned countersigning operators, $o$ over-claims, $age$ days of history and
+$a$ accepted, $m$ distinct pinned countersigning operators (a maintainer's vouch adds to $m$ and nothing else), $o$ over-claims, $age$ days of history and
 $r_i$ the age of each rejection:
 \begin{align*}
 P &= \tfrac{a}{n}, \qquad B = \min(1, \tfrac{m}{3}), \qquad S = \min(1,\tfrac{age}{90})\cdot\min(1,\tfrac{n}{10}),\\
-C &= \max(0, 1-\tfrac{2o}{n}), \qquad R = 1 - \tfrac{1}{2}\min\!\Big(1, \textstyle\sum_i e^{-r_i/30}\Big),\\
+C &= \max(0, 1-\tfrac{2o}{n}), \qquad R = 1 - \tfrac{1}{2}\min\!\Big(1, \textstyle\sum_i e^{-r_i/30} \big/ \max(1, \tfrac{n}{10})\Big),\\
 \text{score} &= 0 \text{ if any entry is disqualifying or } o/n \ge \tfrac12, \text{ else } P\,(0.5 + 0.2B + 0.2S + 0.1C)\,R.
 \end{align*}
 The default floor for \lvl{2} is $0.60$ with at least five counted entries from at least two distinct pinned
@@ -759,7 +759,9 @@ countersigners and a ledger at least 30 days old; the age is a gate, not a term.
 rubric closes a specific attack a reviewer demonstrated. Duplicates counted as positives, so a finder could
 farm them from public cases; they are now neutral. Withdrawing was penalised, which punishes the behaviour you
 want. Recency looked only at the most recent rejection, so ten rejections last month scored as one; it now sums
-them with decay. Calibration carried a tenth of the weight, so over-claiming \lvl{3} on every statement cost
+them with decay, divided by $\max(1, n/10)$, because summing alone let one fresh rejection halve any score: a finder
+with 49 acceptances fell to $0.49$, below the floor, on a single negative entry from any pinned platform. A vouch
+counted toward $n$ but not $a$, so vouching for a finder lowered its precision; it now adds a countersigner only. Calibration carried a tenth of the weight, so over-claiming \lvl{3} on every statement cost
 $0.1$; it is now twice as steep and disqualifying at half the window. And two colluding keys with five
 accepted entries scored $0.733$ on day zero, above the floor; the age gate and the countersigner allowlist
 close that, and the specification says plainly that two countersigners is a floor on distinct pinned operators
