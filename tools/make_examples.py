@@ -114,7 +114,10 @@ def main() -> None:
     reexec = {"status": "matched", "revision": commit, "command": command, "testDigest": d("test body"), "sandbox": sandbox, "attempts": 1,
               "observedExit": 1, "securityFailure": True, "touchedSubject": True, "outputDigest": output}
     reexec_patch = {**reexec, "applied": True, "reproductionPasses": True, "suitePasses": True, "scope": "source-only",
-                    "review": {"approved": True, "reviewerFamily": "qwen", "distinctFamily": True, "verdictDigest": d("approved")}}
+                    "review": {"approved": True, "distinctFamily": True, "verdictDigest": d("approved"),
+                               # the MBOM declares qwen and claude, and claude is API-served: two reviewers, neither of those
+                               "reviewers": [{"family": "llama", "approved": True, "verdictDigest": d("approved: llama")},
+                                             {"family": "mistral", "approved": True, "verdictDigest": d("approved: mistral")}]}}
 
     def finish(pred: dict, name: str, *, subj: list | None = None, receipt_reexec: dict | None = None, enclave_sign: bool = False) -> dict:
         env = sign_envelope(statement(subj or subject, pred), [("finder:agent:researcher-1", finder)])

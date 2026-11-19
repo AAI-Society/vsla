@@ -954,8 +954,20 @@ def verify(envelope: dict[str, Any], keyring: Keyring, *, expectations: dict[str
         # E8: the receiver's own adversarial review on a different model family, over a source-only diff
         rv = rx.get("review") or {}
         scope_ok = rx.get("scope") == "source-only"
-        _run(E, "E8", 2, rx_at_rev and rv.get("approved") is True and rv.get("distinctFamily") is True and scope_ok,
-             f"receiver review approved={rv.get('approved')} distinctFamily={rv.get('distinctFamily')} scope={rx.get('scope')}; finder-asserted review is informational")
+        # below L3 the MBOM's families are the finder's word: with any API-served or unattested model, two approving
+        # reviewers of distinct families, neither declared in the MBOM, so a mislabelled patcher matches at most one
+        models = [m for m in (pred.get("mbom") or {}).get("models", []) if isinstance(m, dict)]
+        declared = {m.get("family") for m in models}
+        word_only = any(m.get("serving") == "api" or not ((m.get("weights") or {}).get("attestation")) for m in models)
+        reviewers = [r for r in rv.get("reviewers", []) if isinstance(r, dict)]
+        independent = {r.get("family") for r in reviewers if r.get("approved") is True and r.get("family") and r.get("family") not in declared}
+        need = 2 if word_only else 1
+        review_ok = (rv.get("approved") is True and rv.get("distinctFamily") is True and len(independent) >= need
+                     and all(r.get("approved") is True for r in reviewers))
+        _run(E, "E8", 2, rx_at_rev and review_ok and scope_ok,
+             f"receiver review approved={rv.get('approved')} reviewers={sorted(f for f in independent if f)} need {need} undeclared "
+             f"famil{'ies' if need > 1 else 'y'} ({'MBOM families are the finder' + chr(39) + 's word' if word_only else 'MBOM attested'}) "
+             f"scope={rx.get('scope')}; finder-asserted review is informational")
     else:
         _run(E, "E7", 2, rx_at_rev and rx.get("observedExit") == 1 and rx.get("securityFailure") is True and rx.get("touchedSubject") is True,
              f"re-execution status={rx.get('status')!r} touchedSubject={rx.get('touchedSubject')} isolation={iso} by {who}")

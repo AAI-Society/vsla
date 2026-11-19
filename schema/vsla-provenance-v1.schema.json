@@ -299,7 +299,12 @@
               "properties": {
                 "approved": { "type": "boolean" },
                 "reviewerFamily": { "type": "string" },
-                "distinctFamily": { "type": "boolean", "description": "the platform's reviewer is a different model family from every patcher in the MBOM (VSLA-P-10)" },
+                "distinctFamily": { "type": "boolean", "description": "the platform's reviewers are of model families the MBOM does not declare (VSLA-P-10)" },
+                "reviewers": {
+                  "description": "each receiver reviewer and its verdict; with any API-served or unattested model in the MBOM, at least two approving reviewers of distinct families, none declared in the MBOM (VSLA-P-10)",
+                  "type": "array",
+                  "items": { "type": "object", "required": ["family", "approved"], "properties": { "family": { "type": "string" }, "approved": { "type": "boolean" }, "verdictDigest": { "$ref": "#/$defs/digestSet" } } }
+                },
                 "verdictDigest": { "$ref": "#/$defs/digestSet" }
               }
             }

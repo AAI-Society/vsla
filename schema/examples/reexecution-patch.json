@@ -25,10 +25,25 @@
   "scope": "source-only",
   "review": {
     "approved": true,
-    "reviewerFamily": "qwen",
     "distinctFamily": true,
     "verdictDigest": {
       "sha256": "2687f86ed6784b8a5fca36e6c468e12aa44dc3c7e8137e3160d1a95079bdcd02"
-    }
+    },
+    "reviewers": [
+      {
+        "family": "llama",
+        "approved": true,
+        "verdictDigest": {
+          "sha256": "3ebc6f1a0dab53cf97faf2741bf6cc25ba47d3721f8c6d4fdaae482b96fb6ef9"
+        }
+      },
+      {
+        "family": "mistral",
+        "approved": true,
+        "verdictDigest": {
+          "sha256": "690155a4dec943bbf363156faf9edf1c1367806e6f164ac79625fe9a41402c74"
+        }
+      }
+    ]
   }
 }
