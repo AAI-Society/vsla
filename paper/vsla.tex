@@ -797,7 +797,7 @@ authors' hunter runs, it denies network through \texttt{sandbox-exec} and nothin
 production intake must use the VM-backed sandbox, and the receipt says which was used, so a reader of any receipt
 can tell a pilot-grade re-execution from a development one. The \vsla{} repository ships a reference
 verifier and signed examples on both tracks at every level, which the implementation's tests cross-check for
-byte compatibility. Not every requirement id has a test that cites it; the ones that do are listed in the
+byte compatibility; both were written by the same team, so this shows consistency, not independent agreement. Not every requirement id has a test that cites it; the ones that do are listed in the
 specification.
 
 \section{Pilots}
@@ -918,6 +918,13 @@ one word, backed by evidence either can re-check against keys and expectations o
 Attested, Trusted, or Hardened. It also says, for each threat, whether that word defeats, mitigates or merely
 records it. The specification, schema, signed examples, reference verifier and figures are at \url{https://github.com/AAI-Society/vsla}; the implementation is in qudisclose.
 The pilots will tell us whether the word is worth anything to the people who merge the patches.
+
+\section*{Competing interests}
+The author is affiliated with Quome, Inc., which develops qudisclose, the only implementation of \vsla{} described
+here, and runs the hunter and patch agents the paper uses as its examples. The reference verifier, the signed examples
+and qudisclose were written by the same team, so the byte compatibility reported in Section~\ref{sec:impl} shows that
+they are consistent with each other, not that two independent readings of the specification agree. We would welcome an
+independent implementation of the verifier and will list any that is reported.
 
 \section*{Acknowledgements}
 The author thanks Katie Moussouris (Luta Security) for a conversation on October 28, 2026 that inspired this
