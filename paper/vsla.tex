@@ -128,7 +128,8 @@ model bill of materials, to a Merkle-rooted transcript of every model turn and t
 that was executed by code rather than asserted by a model (\lvl{1}). A disclosure platform re-executes the
 reproduction itself, countersigns a receipt, and verifies the finder's countersigned trust ledger against the
 countersigners it has pinned (\lvl{2}). At the top, the model weights, harness and signing key live in an
-attested environment, so the statement is attributable to a measured run (\lvl{3}). None of the primitives are new: signed in-toto statements, Merkle-logged agent runs, attested inference and agent
+attested environment, so the statement is attributable to a measured run (\lvl{3}); \lvl{3} is specified and has a reference
+adapter, but no hardware adapter exists yet and no deployment we know of, ours included, can reach it today. None of the primitives are new: signed in-toto statements, Merkle-logged agent runs, attested inference and agent
 reputation ledgers all exist. What is new is their composition into graded, verifiable levels for the disclosure
 itself, with reproduction-by-code and receiver re-execution as the evidence rule that separates the levels. We
 give the threat model, with each threat marked as defeated, mitigated or merely recorded at its level; the
@@ -498,6 +499,14 @@ traceable. It does not buy an honest harness (the allowlist is where that judgem
 operator still chooses what the enclave sees), or well-behaved weights (attestation names the bytes, not the
 behaviour). An API-served model cannot be measured, so a pipeline with any API-served model, including the
 one this paper's authors run for their patch agents, stops at \lvl{2} on the Environment pillar.
+
+\textbf{Status of \lvl{3}.} \lvl{3} is specified and is not yet reachable. Three things stand in the way, and a
+reader should weigh the level accordingly. The reference verifier's only environment adapter is the
+\texttt{signed-quote} form, which a production verifier must not allowlist; SEV-SNP, TDX and Nitro adapters are not
+implemented. Every model in the MBOM needs a provider-signed weight attestation (VSLA-F-17), and few providers of open
+weights publish one today; model signing~\cite{modelsigning} is the path, not yet the norm. And any API-served model
+caps the Environment pillar at \lvl{2}, which today covers most agent pipelines, including ours. The levels that a
+deployment can reach now are \lvl{1} and \lvl{2}; \lvl{3} is the design target that says what hardening would buy.
 
 \paragraph{Where the \slsa{} analogy breaks.} The first draft said \lvl{3} ``is the same move \slsa{} Build
 \lvl{3} makes''. It is not. \slsa{} Build \lvl{3} is non-forgeable because a \emph{third party}, the hosted build

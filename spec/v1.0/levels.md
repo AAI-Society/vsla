@@ -102,6 +102,11 @@ operator still chooses what the enclave sees), or well-behaved weights (attestat
 behaviour). An API-served model cannot be measured, so a pipeline with any API-served model stops at L2 on the
 Environment pillar.
 
+**Status.** L3 is specified and not yet reachable. The reference verifier's only environment adapter is
+`signed-quote`, which a production verifier must not allowlist (VSLA-F-15); SEV-SNP, TDX and Nitro adapters are not
+implemented; VSLA-F-17 needs a provider-signed weight attestation for every model, which few open-weight providers
+publish today; and any API-served model caps the Environment pillar at L2.
+
 **Where the SLSA analogy breaks.** SLSA Build L3 is non-forgeable because a *third party* (the hosted build
 platform) holds the signing key away from the producer. VSLA L2 is a receiver-side property with no SLSA
 analogue (the consumer re-executes and countersigns), and VSLA L3 keeps the key in hardware the *producer*
