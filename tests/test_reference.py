@@ -492,6 +492,11 @@ def test_trust_score_rubric_v11():
     one = [*bodies, {**bodies[-1], "outcome": "rejected"}]
     ten = [*bodies, *[{**bodies[-1], "outcome": "rejected"} for _ in range(10)]]
     assert v.trust_score(ten, now_days=T0_DAYS)["score"] < v.trust_score(one, now_days=T0_DAYS)["score"]
+    # a disqualifying outcome is not washed out of the 50-entry window by later volume: it holds for a year by `at`
+    retracted = {**bodies[-1], "outcome": "retracted", "at": T0_DAYS - 100}
+    later = [{**bodies[-1], "outcome": "accepted", "at": T0_DAYS - 99 + i} for i in range(60)]
+    assert v.trust_score([*bodies, retracted, *later], now_days=T0_DAYS)["score"] == 0.0
+    assert v.trust_score([*bodies, {**retracted, "at": T0_DAYS - 400}, *later], now_days=T0_DAYS)["score"] > 0.0
     # a vouch counts toward n and m but not toward accepted
     vouched = [{**bodies[0], "vouched": True, "countersigner": "maintainer:new/project"}]
     assert v.trust_score(vouched, now_days=T0_DAYS)["accepted"] == 0 and v.trust_score(vouched, now_days=T0_DAYS)["n"] == 1

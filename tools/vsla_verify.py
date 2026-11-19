@@ -651,6 +651,7 @@ def public_hex(pub: Ed25519PublicKey) -> str:
 DISQUALIFYING = {"non-authoritative-release", "ledger-fork", "retracted"}
 NEGATIVE = {"rejected", "false-positive"}
 NEUTRAL = {"duplicate", "withdrawn", "reproduced-unresolved"}
+DISQUALIFY_LOOKBACK_DAYS = 365   # a disqualifying outcome holds this long by `at`, whatever volume follows it
 
 
 def countersigner_operator(keyid: str) -> str:
@@ -663,7 +664,8 @@ def trust_score(entries: list[dict[str, Any]], *, window: int = 50, now_days: fl
     verified?, kind?, vouched?}); the caller has already dropped entries whose countersignature did not verify. The
     window is the last W entries by countersigned `at`, so presented order cannot move the score. Neutral outcomes
     (duplicate, withdrawn, reproduced-unresolved) are excluded from the window entirely so they can neither pump nor
-    sink the score. `m` counts distinct operators, not keyids. `now_days` is the evaluation instant (a verifier passes
+    sink the score. A disqualifying outcome counts while it is in the window or within DISQUALIFY_LOOKBACK_DAYS of the
+    evaluation instant, so later volume cannot push it out. `m` counts distinct operators, not keyids. `now_days` is the evaluation instant (a verifier passes
     `t_eval`, so the score is a function of the inputs, not of the verifier's clock). `at` may be a day number (tests)
     or an ISO timestamp."""
 
@@ -674,14 +676,17 @@ def trust_score(entries: list[dict[str, Any]], *, window: int = 50, now_days: fl
 
     ents = [e for e in entries if e.get("countersigner") and e.get("kind", "outcome") == "outcome" and e.get("outcome") not in NEUTRAL]
     ents = sorted(enumerate(ents), key=lambda ie: (days(ie[1]["at"]), ie[0]))      # window by countersigned time, not presented order
-    ents = [e for _, e in ents][-window:]
+    counted = [e for _, e in ents]
+    ents = counted[-window:]
     n = len(ents)
     if n == 0:
         return {"score": 0.0, "n": 0, "accepted": 0, "rejected": 0, "disqualifying": 0, "countersigners": 0, "over_claims": 0,
                 "age_days": 0.0, "components": {}, "reason": "no countersigned entries"}
     now = now_days if now_days is not None else datetime.now(UTC).timestamp() / 86400
     a = sum(e["outcome"] == "accepted" and not e.get("vouched") for e in ents)
-    x = sum(e["outcome"] in DISQUALIFYING for e in ents)
+    # disqualifying outcomes are read over the lookback as well as the window, so later volume cannot wash one out
+    in_window = {id(e) for e in ents}
+    x = sum(e["outcome"] in DISQUALIFYING and (id(e) in in_window or now - days(e["at"]) <= DISQUALIFY_LOOKBACK_DAYS) for e in counted)
     m = len({countersigner_operator(e["countersigner"]) for e in ents})
     o = sum(1 for e in ents if e.get("claimed") is not None and e.get("verified") is not None and e["claimed"] > e["verified"])
     age = max(0.0, now - min(days(e["at"]) for e in ents))

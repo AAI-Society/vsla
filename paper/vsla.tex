@@ -151,7 +151,7 @@ failing test.
 \noindent\begin{minipage}[t]{0.47\textwidth}\footnotesize
 \begin{description}[leftmargin=0pt, labelsep=0.5em, itemsep=0.25em, font=\normalfont\bfseries]
   \item[1--3 \, Why, and what already exists.] Human CVD meets machine finders; \slsa{}, in-toto, DSSE, TEEs and transparency logs; what each primitive already does and what this paper adds (Table~\ref{tab:related}).
-  \item[\ref{sec:threats} \, What goes wrong.] Twenty-five threats, each marked \emph{defeated}, \emph{mitigated} or \emph{recorded} at a level (Figure~\ref{fig:threats}). Start here if you are a maintainer.
+  \item[\ref{sec:threats} \, What goes wrong.] Twenty-six threats, each marked \emph{defeated}, \emph{mitigated} or \emph{recorded} at a level (Figure~\ref{fig:threats}). Start here if you are a maintainer.
   \item[\ref{sec:framework} \, The framework.] Three pillars, four levels, two tracks, and the rule that the weakest pillar sets the level.
   \item[\ref{sec:provenance} \, Provenance.] The statement, the receipt, the ledger and the quote: digests go in, bodies stay out. Start here if you will implement it.
 \end{description}
@@ -342,7 +342,7 @@ Slop detection & Slop-Score~\cite{slopsurvey} & substance as a mechanical requir
 
 \begin{figure}[htbp]
   \centering\includegraphics[width=0.88\linewidth]{../figures/pdf/fig-threats.pdf}
-  \caption{Where each threat stops. The glyph at a level says what that level does against the threat: \emph{defeated} (detected mechanically, the disclosure is treated as \lvl{0}), \emph{mitigated} (costlier, still possible) or \emph{recorded} (it succeeds and is attributable afterwards); a second glyph to the right says what a higher level adds. Twenty-five threats; T2 is split into edits and omissions. The specification's table carries the residuals.}
+  \caption{Where each threat stops. The glyph at a level says what that level does against the threat: \emph{defeated} (detected mechanically, the disclosure is treated as \lvl{0}), \emph{mitigated} (costlier, still possible) or \emph{recorded} (it succeeds and is attributable afterwards); a second glyph to the right says what a higher level adds. Twenty-six threats; T2 is split into edits and omissions. The specification's table carries the residuals.}
   \label{fig:threats}
 \end{figure}
 
@@ -387,7 +387,12 @@ paper says so where it matters (Section~\ref{sec:discussion}). \emph{Sybil count
 operator running two keys and two platforms, or a finder presenting another finder's published ledger as its own;
 the defence is that a verifier counts only countersigners it has pinned, per operator, that every entry is bound to
 the finder's key and the track it was earned on, and a hard age gate on the floor. \emph{Duplicate farming} (T21), replaying public cases to collect
-positive outcomes, is defeated by making duplicates neutral in the rubric. A \emph{compromised finder key}
+positive outcomes, is defeated by making duplicates neutral in the rubric. An \emph{identity reset} (T26) is the cheap
+version of the same game: a disqualified finder sits at \lvl{1}, which is exactly where a brand-new key starts, so it
+can discard its key and climb again, or keep it and bury a \texttt{retracted} entry under fifty cheap acceptances until
+the window no longer sees it. Disqualifying outcomes are therefore read over a 365-day lookback as well as the window,
+and a platform tracks them per operator, so a new key from a recently disqualified operator is known-bad rather than
+unknown; that moves the cost of a reset from a key to an operator name, and no further. A \emph{compromised finder key}
 (T25) inherits the finder's score; validity windows, revocation entries and anchored receipts are the
 mitigation.
 
@@ -759,7 +764,8 @@ countersigners and a ledger at least 30 days old; the age is a gate, not a term.
 rubric closes a specific attack a reviewer demonstrated. Duplicates counted as positives, so a finder could
 farm them from public cases; they are now neutral. Withdrawing was penalised, which punishes the behaviour you
 want. Recency looked only at the most recent rejection, so ten rejections last month scored as one; it now sums
-them with decay. Calibration carried a tenth of the weight, so over-claiming \lvl{3} on every statement cost
+them with decay. A disqualifying outcome counted only while it sat in the window, so fifty later entries erased it;
+it now holds for 365 days by countersigned time. Calibration carried a tenth of the weight, so over-claiming \lvl{3} on every statement cost
 $0.1$; it is now twice as steep and disqualifying at half the window. And two colluding keys with five
 accepted entries scored $0.733$ on day zero, above the floor; the age gate and the countersigner allowlist
 close that, and the specification says plainly that two countersigners is a floor on distinct pinned operators

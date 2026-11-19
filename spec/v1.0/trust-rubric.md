@@ -18,7 +18,7 @@ the evaluation instant `t_eval` ([VSLA-V-7](requirements.md)):
 | `n` | counted entries in the window: outcomes `accepted` (including `vouched`), `rejected`, `false-positive`, and the disqualifying outcomes. **Neutral** outcomes (`duplicate`, `withdrawn`, `reproduced-unresolved`) are excluded from the window entirely, so they can neither pump nor sink the score |
 | `a` | outcomes `accepted` that are not `vouched` |
 | `r_i` | the age in days of each `rejected` or `false-positive` entry |
-| `x` | outcomes `non-authoritative-release`, `retracted`, `ledger-fork` (disqualifying) |
+| `x` | outcomes `non-authoritative-release`, `retracted`, `ledger-fork` (disqualifying), counted while in the window **or** within 365 days of `t_eval` by countersigned `at`, so later volume cannot push one out of the window |
 | `m` | distinct pinned countersigners, counted per operator: the name part of the keyid (`platform:acme.example` and `maintainer:acme.example` are one countersigner) |
 | `o` | over-claims: entries where `claimed > verified` |
 | `age` | days since the oldest counted entry in the window |
@@ -89,7 +89,8 @@ countersigners the reader has pinned, and a reader who pins none should read it 
 | Spending Finding history on the Patch track | ledgers are per track; a verifier drops entries for another track |
 | Ordering a long history so rejections fall out of the window | the window is by countersigned `at`, which the finder cannot choose |
 | Omitting a platform's negative entry on the next submission | the platform checks that every entry it countersigned is included, so the omission is a `ledger-fork` there |
-| Rotating to a fresh key to shed history | a `successor` entry carries the history forward; a fresh key without one starts at zero, by design |
+| Rotating to a fresh key to shed history | a `successor` entry carries the history forward; a fresh key without one starts at zero, which is also where a disqualified key sits, so a platform tracks disqualifying outcomes per **operator** and treats a new key from a recently disqualified operator as known-bad rather than unknown (VSLA-P-17) |
+| Burying a disqualifying outcome under 50 later entries | disqualifying outcomes are read over a 365-day lookback by `at` as well as the window |
 | Verifying at a convenient time so a rejection has decayed | every age is measured from `t_eval`, which the anchor fixes |
 | Farming `duplicate` against public cases | duplicates are neutral and excluded |
 | Over-claiming L3 on every statement | disqualified at `o/n ≥ 1/2` |
