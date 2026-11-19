@@ -876,7 +876,11 @@ judgement of which measurements to allowlist; it proves which bytes ran and noth
 Transcript roots prove nothing about completeness below \lvl{3}. Re-execution is attacker-chosen code executed
 by the receiver before any trust exists; it is cheap next to a maintainer's hour only when it is isolated and
 admission-controlled, and the first draft listed neither requirement. The platform's key is the whole of
-\lvl{2}, the design centralises it, and receipts rest on one clock until they are anchored. The rubric will be
+\lvl{2}, the design centralises it, and receipts rest on one clock until they are anchored. A ledger leaks: the platform may not expose a closed case's
+entry, but the finder must present its whole ledger to every platform it submits to, so each learns which projects
+closed which of the finder's cases, when, and how, including cases that will never be public. Selective disclosure
+would fix that and would also let a finder hide a pinned platform's rejection from everyone else, and we have not
+found a form that does one without the other. The rubric will be
 gamed; its second version closes the attacks its first version was shown to permit, and the specification
 lists the ones it still permits. A 7-day embargo with publication on fix is shorter than most distribution
 rebuild cycles, so for a project with downstream distributions the fix is the zero-day; the embargo belongs to

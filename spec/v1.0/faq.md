@@ -31,6 +31,17 @@ what channel, and those are the facts that disputes are about: who disclosed fir
 respected, whether the fix went out through the authoritative distribution. Only the receiver can sign those,
 and the receiver's clock is only as good as the transparency log it anchors the receipt in.
 
+**Does presenting a ledger leak other platforms' cases?**
+Yes, to the platform it is presented to. VSLA-P-13 stops a platform from exposing a closed case's entry, but VSLA-F-11
+requires the finder to present every entry for the track, so platform B sees which countersigners (often named
+projects) closed which of the finder's cases, when, and with what outcome. Two partial answers are in the spec: B must
+treat those entries as confidential (P-13), and countersigners should not write `rejected` for a real issue a
+maintainer declines to fix. The full answer would be selective disclosure (present entries from countersigners B does
+not pin as Merkle leaf hashes only, which keeps the root and the consistency checks), but that also lets a finder hide
+a pinned platform's rejection from a third platform that also pins it, because B cannot tell which hidden leaf was
+whose. It is an open problem; a shared transparency log of entries, which the spec already names as the remedy for
+split views, would need the same answer.
+
 **Why a trust ledger instead of a bounty?**
 Bounties pay for findings and so reward volume and first-to-file. Maintainers of core infrastructure have
 rejected bounty programs for their projects because of the arguments they generate over breaking fixes and
