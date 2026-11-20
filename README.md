@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img alt="Spec v1.0" src="https://img.shields.io/badge/spec-v1.0%20draft%20rev%202-CFFF04?style=flat-square&labelColor=0A0A0A">
+  <img alt="Spec v1.0" src="https://img.shields.io/badge/spec-v1.0%20draft%20rev%204-CFFF04?style=flat-square&labelColor=0A0A0A">
   <img alt="in-toto" src="https://img.shields.io/badge/provenance-in--toto%20%2B%20DSSE-CFFF04?style=flat-square&labelColor=0A0A0A">
   <img alt="Merkle" src="https://img.shields.io/badge/transcript-RFC%206962%20Merkle-CFFF04?style=flat-square&labelColor=0A0A0A">
   <img alt="Implementation" src="https://img.shields.io/badge/implementation-qudisclose-CFFF04?style=flat-square&labelColor=0A0A0A">
@@ -115,7 +115,7 @@ colluding keys cannot reach L2 on day zero.
 
 <p align="center"><img src="figures/fig-history.svg" width="860" alt="Trust history ledger"></p>
 
-The [rubric](spec/v1.0/trust-rubric.md) is five lines of arithmetic so that two platforms compute the same
+The [rubric](spec/v1.0/trust-rubric.md) is six lines of arithmetic so that two platforms compute the same
 number from the same ledger, and it lists the ways it can be gamed and what it does about each.
 
 ## Where each threat stops
@@ -150,7 +150,7 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
     --ledger schema/examples/ledger.json --receipt schema/examples/finding-l3.receipt.dsse.json \
     --reexec schema/examples/reexecution.json --intake https://cvd.example.org/mcp --require-anchor
 #   ... "VSLA finding: claimed L3, verified L3"
-.venv/bin/python -m pytest -q                    # 53 tests, one per demonstrated attack
+.venv/bin/python -m pytest -q                    # 53 tests; each attack the reviews demonstrated is pinned by a regression test
 ```
 
 Drop `--reexec` and `--receipt` and Evidence stops at L1: a coordinator holding the statement but not the code
@@ -195,8 +195,8 @@ Every primitive in VSLA is borrowed on purpose. Signed in-toto statements for AI
 standardised now ([in-toto AI code-generation predicate proposal](https://github.com/in-toto/attestation/issues/604),
 [attest](https://github.com/Parth2412/attest)); Merkle-logged, DSSE-signed agent runs exist
 ([Agent Flight Recorder](https://arxiv.org/abs/2609.01931), [NovaFabric](https://arxiv.org/abs/2609.12582),
-[VCT](https://www.mdpi.com/2079-9292/15/21/5022)); TEE-attested model runs written to a consistency-proofed log
-exist ([grant-evaluation paper](https://arxiv.org/abs/2604.25200)); agent reputation ledgers are proposed
+[VCT](https://www.mdpi.com/2079-9292/15/21/5022)); a TEE architecture for attested model runs, with a consistency-proofed log recommended for its output, is
+proposed ([grant-evaluation paper](https://arxiv.org/abs/2604.25200)); agent reputation ledgers are proposed
 ([AgentReputation](https://arxiv.org/abs/2605.00073), [Zer0n](https://arxiv.org/abs/2601.07019)); and a
 SLSA-style tiering has been applied to [agent skill packages](https://arxiv.org/abs/2603.00195). The "AI slop"
 problem is documented from the maintainer's side ([HeroDevs](https://www.herodevs.com/blog-posts/the-security-slop-slavine-why-ai-cant-replace-domain-expertise),
@@ -225,7 +225,7 @@ never checked. A third round, from the standpoint of a transparency-log maintain
 researcher, found the specification undecided on who owns the ledger's index and which clock governs validity, with
 honest finders forking as a result, key rotation specified but unimplemented, a timestamp read as log inclusion, and
 three read surfaces leaking embargoed cases. All of that is changed and pinned by tests: every attack the
-reviews demonstrated is a failing test in [`tests/`](tests), listed in [the verification chapter](spec/v1.0/verification.md). The
+reviews demonstrated is pinned by a regression test in [`tests/`](tests), listed in [the verification chapter](spec/v1.0/verification.md). The
 Environment pillar's L3 adapters remain an interface with a reference signed-quote implementation; real
 SEV-SNP, TDX and Nitro quote verification are not claimed as done. Receipt anchoring has two forms, log inclusion (signed checkpoint plus inclusion
 proof, which the verifier requires) and a signed timestamp (accepted only by explicit policy); Rekor and SCITT
