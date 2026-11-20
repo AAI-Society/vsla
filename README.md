@@ -150,7 +150,7 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
     --ledger schema/examples/ledger.json --receipt schema/examples/finding-l3.receipt.dsse.json \
     --reexec schema/examples/reexecution.json --intake https://cvd.example.org/mcp --require-anchor
 #   ... "VSLA finding: claimed L3, verified L3"
-.venv/bin/python -m pytest -q                    # 53 tests; each attack the reviews demonstrated is pinned by a regression test
+.venv/bin/python -m pytest -q                    # each attack the reviews demonstrated is pinned by a regression test
 ```
 
 Drop `--reexec` and `--receipt` and Evidence stops at L1: a coordinator holding the statement but not the code

@@ -275,9 +275,9 @@ technique; its contribution is only to make the commitment a required field of a
 leaf (the code-side verification step) a verifier must find in it.
 
 \paragraph{Attested inference.}
-Running model evaluation inside a TEE, checking the attestation chain to the hardware root, verifying that the
-measurement matches an approved model and prompt, and appending the attested bundle to a consistency-proofed log
-is proposed for AI-assisted grant evaluation~\cite{teegrant}, which recommends a Certificate-Transparency-style log. \vsla{} \lvl{3} is that design applied to a finder,
+Running model evaluation inside a TEE, checking the attestation chain to the hardware root, and verifying that the
+measurement matches an approved model and prompt is proposed for AI-assisted grant evaluation~\cite{teegrant}, which
+recommends appending the attested bundle to a Certificate-Transparency-style log. \vsla{} \lvl{3} is that design applied to a finder,
 with the signing key bound by the quote. Two caveats from that literature carry over unchanged: a TEE will run
 whatever code it is given and an audit trail will record whatever the agent does, so neither establishes that
 the agent's intent was legitimate~\cite{aiidentity}; and attestation binds execution to a code hash but does
