@@ -21,15 +21,17 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import vsla_verify as v  # noqa: E402
 
-EX = ROOT / "schema" / "examples"
+EX = ROOT / "schema" / "examples"  # rebound to a session temp dir by the `examples` fixture
 T0_DAYS = 20756.583333  # 2026-10-30T14:00Z, the examples' "now"
 INTAKE = "https://cvd.example.org/mcp"
 ALL = [("finding-l1", 1), ("finding-l2", 2), ("finding-l3", 3), ("patch-l1", 1), ("patch-l2", 2), ("patch-l3", 3)]
 
 
 @pytest.fixture(scope="session", autouse=True)
-def examples():
-    subprocess.run([sys.executable, str(ROOT / "tools" / "make_examples.py")], check=True, capture_output=True)
+def examples(tmp_path_factory):
+    global EX
+    EX = tmp_path_factory.mktemp("examples")
+    subprocess.run([sys.executable, str(ROOT / "tools" / "make_examples.py"), str(EX)], check=True, capture_output=True)
 
 
 def load(name):
