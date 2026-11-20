@@ -187,7 +187,7 @@ Each entry is a DSSE envelope with `payloadType` `application/vnd.vsla.ledger-en
 `signatures[0].keyid` is the countersigner, over:
 
 ```json
-{"kind": "outcome", "seq": 12, "at": "2026-10-11T04:12:09Z", "finder": "ed25519:…", "statement": {"sha256": "…"},
+{"kind": "outcome", "at": "2026-10-11T04:12:09Z", "finder": "ed25519:…", "statement": {"sha256": "…"},
  "platform": "cvd.example.org", "track": "finding", "outcome": "accepted", "claimed": 2, "verified": 2}
 ```
 

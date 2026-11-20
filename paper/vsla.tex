@@ -199,7 +199,7 @@ two tracks, one provenance predicate, one verification procedure, one score.
 We want to be precise about the claim, because every primitive in \vsla{} exists elsewhere and a reader who
 knows the supply-chain literature will recognise each one. Signed in-toto statements for AI-produced code are
 being standardised now~\cite{intoto604,attestproj}; Merkle-logged, DSSE-signed agent runs exist~\cite{flightrecorder,novafabric,vct};
-model inference attested in a TEE and written to a consistency-proofed log exists~\cite{teegrant}; reputation
+a TEE architecture for attested model inference, with a consistency-proofed log recommended for its output, is proposed~\cite{teegrant}; reputation
 ledgers for agents are proposed~\cite{agentreputation,zer0n}; and a \slsa{}-style tiering has been applied to
 agent skill packages~\cite{skillslsa}. Section~\ref{sec:related} goes through each. What we could not find, and
 what this paper contributes, is:
@@ -275,9 +275,9 @@ technique; its contribution is only to make the commitment a required field of a
 leaf (the code-side verification step) a verifier must find in it.
 
 \paragraph{Attested inference.}
-Running model evaluation inside a TEE, checking the attestation chain to the hardware root, verifying that the
-measurement matches an approved model and prompt, and appending the attested bundle to a consistency-proofed log
-has been built for AI-assisted grant evaluation~\cite{teegrant}. \vsla{} \lvl{3} is that design applied to a finder,
+Running model evaluation inside a TEE, checking the attestation chain to the hardware root, and verifying that the
+measurement matches an approved model and prompt is proposed for AI-assisted grant evaluation~\cite{teegrant}, which
+recommends appending the attested bundle to a Certificate-Transparency-style log. \vsla{} \lvl{3} is that design applied to a finder,
 with the signing key bound by the quote. Two caveats from that literature carry over unchanged: a TEE will run
 whatever code it is given and an audit trail will record whatever the agent does, so neither establishes that
 the agent's intent was legitimate~\cite{aiidentity}; and attestation binds execution to a code hash but does

@@ -118,6 +118,6 @@ The attacks two review rounds demonstrated against earlier revisions of this ver
 each, are each pinned by a test in `tests/test_reference.py`: a self-reported ledger summary (I4), unverified
 countersignatures (I4), a receipt signed by the finder's own pinned key (I3, and E7 no longer reads an unverified
 receipt), another finder's published ledger (I4 finder binding), a Finding ledger presented with a Patch statement
-(I4 track binding), a finder-ordered window (I4 `seq` order), two colluding keys on day zero (floors and age gate),
+(I4 track binding), a finder-ordered window (I4: the window is ordered by countersigned `at`), two colluding keys on day zero (floors and age gate),
 duplicate farming (neutral outcomes), a two-operator quote co-signed twice by one root (N3), a pinned enclave key (I5 now
 derives it from the quote), a non-canonical payload with duplicate keys (E1), and a receipt dated in the future (I3).
