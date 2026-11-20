@@ -1,12 +1,20 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "vsla"
 version = "1.0.0"
 description = "VSLA: Vulnerability-disclosure Supply-chain Levels for Agents. Spec, paper, schema and reference verifier."
+license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = ["cryptography>=45", "jsonschema>=4"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+
+[tool.setuptools]
+py-modules = []
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
